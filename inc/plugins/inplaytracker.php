@@ -28,9 +28,9 @@ function inplaytracker_info()
 	return array(
 		"name"			=> $lang->ipt_name,
 		"description"	=> $lang->ipt_description,
-		"website"		=> "https://github.com/its-sparks-fly",
+		"website"		=> "https://github.com/ItsSparksFly",
 		"author"		=> "sparks fly",
-		"authorsite"	=> "https://sparks-fly.info",
+		"authorsite"	=> "https://github.com/ItsSparksFly",
 		"version"		=> "3.0",
 		"compatibility" => "18*"
 	);
@@ -267,6 +267,7 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
+    // TODO: bisschen aufhübschen?
     $inplaytracker_postbit = [
         'title'        => 'inplaytracker_postbit',
         'template'    => $db->escape_string('<br /><br />
@@ -283,6 +284,7 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
+    // TODO: member_profile-Variable an MyBB-Default-Profil anpassen
     $inplaytracker_member_profile = [
         'title'        => 'inplaytracker_member_profile',
         'template'    => $db->escape_string(''),
@@ -422,7 +424,7 @@ function inplaytracker_activate()
     $db->insert_query("templates", $inplaytracker_newthread);
     $db->insert_query("templates", $inplaytracker_postbit);
     $db->insert_query("templates", $inplaytracker_member_profile);
-    #$db->insert_query("templates", $inplaytracker_member_profile_bit);
+    $db->insert_query("templates", $inplaytracker_member_profile_bit);
     $db->insert_query("templates", $inplaytracker_member_profile_bit_user);
     $db->insert_query("templates", $inplaytracker_header);
     $db->insert_query("templates", $inplaytracker_misc);
@@ -434,6 +436,7 @@ function inplaytracker_activate()
     find_replace_templatesets("editpost", "#".preg_quote('{$loginbox}')."#i", '{$loginbox} {$editpost_inplaytracker}');
     find_replace_templatesets("postbit", "#".preg_quote('{$post[\'message\']}')."#i", '{$post[\'inplaytracker\']} {$post[\'message\']}');
     find_replace_templatesets("postbit_classic", "#".preg_quote('{$post[\'message\']}')."#i", '{$post[\'inplaytracker\']} {$post[\'message\']}');
+    // TODO: An Standard-MyBB-Profil anpassen
     find_replace_templatesets("member_profile", "#".preg_quote('<label for="m-tab-2"><i class="far fa-calendar-alt"></i></label>')."#i", '<label for="m-tab-2"><i class="far fa-calendar-alt"></i></label> {$member_profile_inplaytracker}');
     
 }
@@ -493,6 +496,7 @@ function inplaytracker_newthread()
                 }
                 $day_bit .= "<option value=\"$i\" {$selected}>$i</option>";
             }
+            # TODO: Per Language-Variablen lösen
             $months = array(
                 "january" => "Januar",
                 "february" => "Februar",
@@ -534,6 +538,7 @@ function inplaytracker_newthread()
 function inplaytracker_do_newthread() {
     global $db, $mybb, $tid, $partners_new, $partner_uid;
     
+    # FIXME: hier war noch was mit ' escapen.
     $ownuid = $mybb->user['uid'];
     if(!empty($mybb->get_input('partners'))) {
         // insert thread infos into database   
@@ -616,6 +621,7 @@ function inplaytracker_editpost() {
                 $day_bit .= "<option value=\"$i\" {$checked_day}>$i</option>";
             }
 
+            # TODO: mit Language-Variablen lösen
             $months = array(
                 "January" => "Januar",
                 "February" => "Februar",
@@ -800,7 +806,7 @@ function inplaytracker_global() {
     if(empty($as_uid)) {
         $as_uid = $mybb->user['uid'];
     }
-
+    # FIXME: Keine Entwürfe mitzählen!
     $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$mybb->user['uid']}'");
     while($userlist = $db->fetch_array($query)) {
         // get all scenes for this uid...
@@ -841,6 +847,7 @@ function inplaytracker_misc() {
         if(empty($as_uid)) {
             $as_uid = $mybb->user['uid'];
         }
+        # FIXME: Keine Entwürfe mitzählen!
         $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$mybb->user['uid']}'");
         $user_bit = "";
         while($userlist = $db->fetch_array($query)) {  
@@ -890,7 +897,7 @@ function inplaytracker_misc() {
         output_page($page);
     }
     if($mybb->input['action'] == "editscene") {
-        // FIXME Option, dass alle Mitspieler die Infos bearbeiten können einbauen
+        // TODO: Option, dass alle Mitspieler die Infos bearbeiten können einbauen
         eval("\$page = \"".$templates->get("inplaytracker_editscene")."\";");
         output_page($page);
     }
