@@ -496,20 +496,20 @@ function inplaytracker_newthread()
                 }
                 $day_bit .= "<option value=\"$i\" {$selected}>$i</option>";
             }
-            # TODO: Per Language-Variablen lösen
+            
             $months = array(
-                "january" => "Januar",
-                "february" => "Februar",
-                "march" => "März",
-                "april" => "April",
-                "may" => "Mai",
-                "june" => "Juni",
-                "july" => "Juli",
-                "august" => "August",
-                "september" => "September",
-                "october" => "Oktober",
-                "november" => "November",
-                "december" => "Dezember"
+                "January" => $lang->ipt_month_january,
+                "February" => $lang->ipt_month_february,
+                "March" => $lang->ipt_month_march,
+                "April" => $lang->ipt_month_april,
+                "May" => $lang->ipt_month_may,
+                "June" => $lang->ipt_month_june,
+                "July" => $lang->ipt_month_july,
+                "August" => $lang->ipt_month_august,
+                "September" => $lang->ipt_month_september,
+                "October" => $lang->ipt_month_october,
+                "November" => $lang->ipt_month_november,
+                "December" => $lang->ipt_month_december
             );
             $month_bit = "";
             foreach($months as $key => $month) {
@@ -621,20 +621,19 @@ function inplaytracker_editpost() {
                 $day_bit .= "<option value=\"$i\" {$checked_day}>$i</option>";
             }
 
-            # TODO: mit Language-Variablen lösen
             $months = array(
-                "January" => "Januar",
-                "February" => "Februar",
-                "March" => "März",
-                "April" => "April",
-                "May" => "Mai",
-                "June" => "Juni",
-                "July" => "Juli",
-                "August" => "August",
-                "September" => "September",
-                "October" => "Oktober",
-                "November" => "November",
-                "December" => "Dezember"
+                "January" => $lang->ipt_month_january,
+                "February" => $lang->ipt_month_february,
+                "March" => $lang->ipt_month_march,
+                "April" => $lang->ipt_month_april,
+                "May" => $lang->ipt_month_may,
+                "June" => $lang->ipt_month_june,
+                "July" => $lang->ipt_month_july,
+                "August" => $lang->ipt_month_august,
+                "September" => $lang->ipt_month_september,
+                "October" => $lang->ipt_month_october,
+                "November" => $lang->ipt_month_november,
+                "December" => $lang->ipt_month_december
             );
 
             $month_bit = "";

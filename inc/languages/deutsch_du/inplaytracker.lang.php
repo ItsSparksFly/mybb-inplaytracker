@@ -23,4 +23,17 @@ $l['inplaytracker_newreply'] = "{1} hat auf eure Szene \"{2}\" geantwortet!";
 $l['myalerts_setting_inplaytracker_newthread'] = "Benachrichtigung bei neu erstellten Szenen bekommen?";
 $l['myalerts_setting_inplaytracker_newreply'] = "Benachrichtigung bei neu erstellten Antworten auf Szenen bekommen?";
 
+// months
+$l['ipt_month_january'] = "Januar";
+$l['ipt_month_february'] = "Februar";
+$l['ipt_month_march'] = "März";
+$l['ipt_month_april'] = "April";
+$l['ipt_month_may'] = "Mai";
+$l['ipt_month_june'] = "Juni";
+$l['ipt_month_july'] = "July";
+$l['ipt_month_august'] = "August";
+$l['ipt_month_september'] = "September";
+$l['ipt_month_october'] = "Oktober";
+$l['ipt_month_november'] = "November";
+$l['ipt_month_december'] = "Dezember";
 ?>
