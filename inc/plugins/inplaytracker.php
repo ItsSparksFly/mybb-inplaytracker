@@ -284,16 +284,18 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    // TODO: member_profile-Variable an MyBB-Default-Profil anpassen
     $inplaytracker_member_profile = [
         'title'        => 'inplaytracker_member_profile',
         'template'    => $db->escape_string(''),
         'sid'        => '-1',
-        'version'    => '<div class="m-tab-content">
-        <div id="inplaytracker">
-		{$scenes_bit}
-</div>
-</div>',
+        'version'    => '			<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
+        <tr>
+            <td colspan="2" class="thead"><strong>{$lang->inplaytracker}</strong></td>
+        </tr>
+        <tr>
+            <td class="trow1">{$scenes_bit}</td>
+        </tr>
+        </table>',
         'dateline'    => TIME_NOW
     ];
 
@@ -436,8 +438,7 @@ function inplaytracker_activate()
     find_replace_templatesets("editpost", "#".preg_quote('{$loginbox}')."#i", '{$loginbox} {$editpost_inplaytracker}');
     find_replace_templatesets("postbit", "#".preg_quote('{$post[\'message\']}')."#i", '{$post[\'inplaytracker\']} {$post[\'message\']}');
     find_replace_templatesets("postbit_classic", "#".preg_quote('{$post[\'message\']}')."#i", '{$post[\'inplaytracker\']} {$post[\'message\']}');
-    // TODO: An Standard-MyBB-Profil anpassen
-    find_replace_templatesets("member_profile", "#".preg_quote('<label for="m-tab-2"><i class="far fa-calendar-alt"></i></label>')."#i", '<label for="m-tab-2"><i class="far fa-calendar-alt"></i></label> {$member_profile_inplaytracker}');
+    find_replace_templatesets("member_profile", "#".preg_quote('{$awaybit}')."#i", '{$awaybit} {$member_profile_inplaytracker}');
     
 }
 
@@ -538,7 +539,6 @@ function inplaytracker_newthread()
 function inplaytracker_do_newthread() {
     global $db, $mybb, $tid, $partners_new, $partner_uid;
     
-    # FIXME: hier war noch was mit ' escapen.
     $ownuid = $mybb->user['uid'];
     if(!empty($mybb->get_input('partners'))) {
         // insert thread infos into database   
@@ -569,6 +569,13 @@ function inplaytracker_do_newthread() {
             ];
             $db->insert_query("ipt_scenes_partners", $new_record);
 
+            if(class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+                $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('inplaytracker_newthread');
+                if ($alertType != NULL && $alertType->getEnabled() && $ownuid != $partner_uid) {
+                    $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$partner_uid, $alertType, (int)$tid);
+                    MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+                }
+            }
 		}
     }
 }
@@ -805,7 +812,6 @@ function inplaytracker_global() {
     if(empty($as_uid)) {
         $as_uid = $mybb->user['uid'];
     }
-    # FIXME: Keine Entwürfe mitzählen!
     $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$mybb->user['uid']}'");
     while($userlist = $db->fetch_array($query)) {
         // get all scenes for this uid...
@@ -813,7 +819,7 @@ function inplaytracker_global() {
         while($scenelist = $db->fetch_array($query_2)) {
             // get thread infos
             $thread = get_thread($scenelist['tid']);
-            if($thread) {
+            if($thread && $thread['visibility'] == "1") {
                 $lastposter = $thread['lastposteruid'];
                 // get spid matching lastposteruid
                 $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
@@ -846,7 +852,6 @@ function inplaytracker_misc() {
         if(empty($as_uid)) {
             $as_uid = $mybb->user['uid'];
         }
-        # FIXME: Keine Entwürfe mitzählen!
         $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$mybb->user['uid']}'");
         $user_bit = "";
         while($userlist = $db->fetch_array($query)) {  
@@ -860,7 +865,7 @@ function inplaytracker_misc() {
                 $query_3 = $db->simple_select("ipt_scenes", "*", "tid = '{$scenelist['tid']}'");
                 $scene = $db->fetch_array($query_3);
                 $thread = get_thread($scene['tid']);
-                if($thread) {
+                if($thread  && $thread['visibility'] == "1") {
                     $query_4 = $db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'");
                     $partnerusers = [];
                     while($partners = $db->fetch_array($query_4)) {
