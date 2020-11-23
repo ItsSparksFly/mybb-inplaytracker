@@ -172,9 +172,7 @@ function inplaytracker_activate()
                 <strong>{$lang->ipt_newthread_date}</strong>
             </td>
             <td class="trow1">
-                <select name="day">{$day_bit}</select> 
-                <select name="month">{$month_bit}</select>
-                <input type="text" name="year" value="{$ipyear}" style="width: 55px;" class="textbox" />			
+            <input type="date" name="ipdate" value="{$ipdate}" \>		
             </td>
         </tr>
         <tr>
@@ -482,43 +480,8 @@ function inplaytracker_newthread()
                 $partners = htmlspecialchars_uni($mybb->get_input('partners'));
                 $iport = htmlspecialchars_uni($mybb->get_input('iport'));
                 $ipdescription = htmlspecialchars_uni($mybb->get_input('description'));
-                $ipday = (int)$mybb->get_input('day');
-                $ipmonth = htmlspecialchars_uni($mybb->get_input('month'));
-                $ipyear = (int)$mybb->get_input('year');
+                $ipdate = (int)$mybb->get_input('ipdate');
                 $ipprivate = (int)$mybb->get_input('private');
-            }
-
-            // set up date options
-            $day_bit = "";
-            for($i = 1 ; $i < 32 ; $i++) {
-                $selected = "";
-                if($ipday == $i) {
-                    $selected = "selected";
-                }
-                $day_bit .= "<option value=\"$i\" {$selected}>$i</option>";
-            }
-            
-            $months = array(
-                "January" => $lang->ipt_month_january,
-                "February" => $lang->ipt_month_february,
-                "March" => $lang->ipt_month_march,
-                "April" => $lang->ipt_month_april,
-                "May" => $lang->ipt_month_may,
-                "June" => $lang->ipt_month_june,
-                "July" => $lang->ipt_month_july,
-                "August" => $lang->ipt_month_august,
-                "September" => $lang->ipt_month_september,
-                "October" => $lang->ipt_month_october,
-                "November" => $lang->ipt_month_november,
-                "December" => $lang->ipt_month_december
-            );
-            $month_bit = "";
-            foreach($months as $key => $month) {
-                $selected = "";
-                if($ipmonth == $key) {
-                    $selected = "selected";
-                }
-                $month_bit .= "<option value=\"$key\" {$selected}>$month</option>";
             }
 
             // is this thread public?
@@ -542,7 +505,7 @@ function inplaytracker_do_newthread() {
     $ownuid = $mybb->user['uid'];
     if(!empty($mybb->get_input('partners'))) {
         // insert thread infos into database   
-        $ipdate = strtotime($mybb->get_input('day')." ".$mybb->get_input('month')." ".$mybb->get_input('year'));
+        $ipdate = strtotime($mybb->get_input('ipdate'));
         $new_record = [
             "date" => $ipdate,
             "location" => $db->escape_string($mybb->get_input('iport')),
@@ -602,7 +565,7 @@ function inplaytracker_editpost() {
                 $partners = htmlspecialchars_uni($mybb->get_input('partners'));
                 $iport = htmlspecialchars_uni($mybb->get_input('iport'));
                 $ipdescription = htmlspecialchars_uni($mybb->get_input('description'));
-                $ipdate = strtotime($mybb->get_input('day')." ".$mybb->get_input('month')." ".$mybb->get_input('year'));
+                $ipdate = $mybb->get_input('ipdate');
             }
             else
             {
@@ -616,41 +579,6 @@ function inplaytracker_editpost() {
                 $ipdate = htmlspecialchars_uni($scene['date']);
                 $iport = htmlspecialchars_uni($scene['location']);
                 $ipdescription = htmlspecialchars_uni($scene['shortdesc']);
-            }
-
-            $day_bit = "";
-            for($i = 1 ; $i < 32 ; $i++) {
-                $checked_day = "";
-                $active_day = date("j", $ipdate);
-                if($active_day == $i) {
-                    $checked_day = "selected=\"selected\"";
-                }
-                $day_bit .= "<option value=\"$i\" {$checked_day}>$i</option>";
-            }
-
-            $months = array(
-                "January" => $lang->ipt_month_january,
-                "February" => $lang->ipt_month_february,
-                "March" => $lang->ipt_month_march,
-                "April" => $lang->ipt_month_april,
-                "May" => $lang->ipt_month_may,
-                "June" => $lang->ipt_month_june,
-                "July" => $lang->ipt_month_july,
-                "August" => $lang->ipt_month_august,
-                "September" => $lang->ipt_month_september,
-                "October" => $lang->ipt_month_october,
-                "November" => $lang->ipt_month_november,
-                "December" => $lang->ipt_month_december
-            );
-
-            $month_bit = "";
-            foreach($months as $key => $month) {
-                $checked_month = "";
-                $active_month = date("F", $ipdate);
-                if($active_month == $key) {
-                    $checked_month = "selected=\"selected\"";
-                }
-                $month_bit .= "<option value=\"$key\" {$checked_month}>$month</option>";
             }
 
             $ipyear = date("Y", $ipdate);
@@ -693,7 +621,7 @@ function inplaytracker_do_editpost()
             $db->insert_query("ipt_scenes_partners", $new_record);
         }
 
-        $ipdate = strtotime($mybb->input['day']." ".$mybb->input['month']." ".$mybb->input['year']);
+        $ipdate = strtotime($mybb->input['ipdate']);
         
         $new_record = [
             "date" => $ipdate,
