@@ -480,7 +480,7 @@ function inplaytracker_newthread()
                 $partners = htmlspecialchars_uni($mybb->get_input('partners'));
                 $iport = htmlspecialchars_uni($mybb->get_input('iport'));
                 $ipdescription = htmlspecialchars_uni($mybb->get_input('description'));
-                $ipdate = (int)$mybb->get_input('ipdate');
+                $ipdate = $mybb->get_input('ipdate');
                 $ipprivate = (int)$mybb->get_input('private');
             }
 
@@ -576,12 +576,10 @@ function inplaytracker_editpost() {
                     $partners[] = $tagged_user['username'];
                 }
                 $partners = implode(",", $partners);
-                $ipdate = htmlspecialchars_uni($scene['date']);
+                $ipdate = date("Y-m-d", $scene['date']);
                 $iport = htmlspecialchars_uni($scene['location']);
                 $ipdescription = htmlspecialchars_uni($scene['shortdesc']);
             }
-
-            $ipyear = date("Y", $ipdate);
 
             $private = array("0" => "{$lang->ipt_newthread_private_closed}", "1" => "{$lang->ipt_newthread_private_open}");
             foreach($private as $key => $value) {
