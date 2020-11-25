@@ -421,6 +421,141 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
+    $inplaytracker_editscene = [
+        'title'        => 'inplaytracker_editscene',
+        'template'    => $db->escape_string('<html>
+        <head>
+        <title>{$mybb->settings['bbname']} - {$lang->ipt}</title>
+        {$headerinclude}
+        </head>
+        <body>
+        {$header}
+        <form enctype="multipart/form-data" action="misc.php" method="post">
+        <input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+        <table width="100%" border="0" align="center" cellpadding="5" cellspacing="1">
+            <tr>
+                <td class="thead" colspan="2">
+                    Szene <strong>{$thread[\'subject\']}</strong> bearbeiten
+                </td>
+            </tr>
+            <tr>
+                    <td class="trow1" width="20%">
+                        <strong>{$lang->ipt_newthread_partners}</strong>
+                    </td>
+                    <td class="trow1">
+                        <span class="smalltext">
+                            <input type="text" class="textbox" name="partners" id="partners" size="40" maxlength="1155" value="{$partners}" style="min-width: 347px; max-width: 100%;" /> <br />
+                            {$lang->ipt_newthread_partners_description}
+                        </span> 
+                    </td>
+                </tr>
+                <tr>
+                    <td class="trow1" width="20%">
+                        <strong>{$lang->ipt_newthread_date}</strong>
+                    </td>
+                    <td class="trow1">
+                        <input type="date" name="ipdate" value="{$scene[\'date\']}" \>		
+                    </td>
+                </tr>
+                <tr>
+                    <td class="trow1" width="20%">
+                        <strong>{$lang->ipt_newthread_location}</strong>
+                    </td>
+                    <td class="trow1">
+                        <input type="text" class="textbox" name="iport" size="40" maxlength="155" value="{$scene[\'location\']}" /> 
+                    </td>
+                </tr>
+                <tr>
+                    <td class="trow1" width="20%">
+                        <strong>{$lang->ipt_newthread_private}</strong>
+                    </td>
+                    <td class="trow1">
+                        <span class="smalltext">
+                        <select name="private" class="select">{$private_bit}</select>
+                        <br />
+                         {$lang->ipt_newthread_private_description}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="trow1" width="20%">
+                        <strong>{$lang->ipt_newthread_description}</strong>
+                    </td>
+                    <td class="trow1">
+                        <span class="smalltext">
+                            <textarea class="textarea" name="description" maxlength="140" style="min-width: 347px; max-width: 100%; height: 80px;">{$scene[\'shortdesc\']}</textarea>
+                        <br />
+                         {$lang->ipt_newthread_description_description}
+                        </span>
+                    </td>
+                </tr>
+                </table>
+        
+                <br />
+                <div align="center">
+                    <input type="hidden" name="action" value="do_editscene" />
+                    <input type="hidden" name="tid" value="{$tid}" />
+                    <input type="submit" class="button" name="submit" value="Speichern" />
+                </div>
+            </td>
+        </tr>
+        </table>
+        </form>
+        {$footer}
+                <link rel="stylesheet" href="{$mybb->asset_url}/jscripts/select2/select2.css?ver=1807">
+                <script type="text/javascript" src="{$mybb->asset_url}/jscripts/select2/select2.min.js?ver=1806"></script>
+                <script type="text/javascript">
+                <!--
+                if(use_xmlhttprequest == "1")
+                {
+                    MyBB.select2();
+                    $("#partners").select2({
+                        placeholder: "{$lang->search_user}",
+                        minimumInputLength: 2,
+                        maximumSelectionSize: '',
+                        multiple: true,
+                        ajax: { // instead of writing the function to execute the request we use Select2\'s convenient helper
+                            url: "xmlhttp.php?action=get_users",
+                            dataType: \'json\',
+                            data: function (term, page) {
+                                return {
+                                    query: term, // search term
+                                };
+                            },
+                            results: function (data, page) { // parse the results into the format expected by Select2.
+                                // since we are using custom formatting functions we do not need to alter remote JSON data
+                                return {results: data};
+                            }
+                        },
+                        initSelection: function(element, callback) {
+                            var query = $(element).val();
+                            if (query !== "") {
+                                var newqueries = [];
+                                exp_queries = query.split(",");
+                                $.each(exp_queries, function(index, value ){
+                                    if(value.replace(/\s/g, '') != "")
+                                    {
+                                        var newquery = {
+                                            id: value.replace(/,\s?/g, ","),
+                                            text: value.replace(/,\s?/g, ",")
+                                        };
+                                        newqueries.push(newquery);
+                                    }
+                                });
+                                callback(newqueries);
+                            }
+                        }
+                    })
+                }
+                // -->
+                </script>
+        </body>
+        </html>'),
+        'sid'        => '-1',
+        'version'    => '',
+        'dateline'    => TIME_NOW
+    ];
+
     $db->insert_query("templates", $inplaytracker_newthread);
     $db->insert_query("templates", $inplaytracker_postbit);
     $db->insert_query("templates", $inplaytracker_member_profile);
@@ -430,6 +565,7 @@ function inplaytracker_activate()
     $db->insert_query("templates", $inplaytracker_misc);
     $db->insert_query("templates", $inplaytracker_misc_bit);
     $db->insert_query("templates", $inplaytracker_misc_bit_scene);
+    $db->insert_query("templates", $inplaytracker_editscene);
 	
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
     find_replace_templatesets("newthread", "#".preg_quote('{$loginbox}')."#i", '{$loginbox} {$newthread_inplaytracker}');
@@ -634,12 +770,13 @@ function inplaytracker_do_editpost()
 
 function inplaytracker_forumdisplay(&$thread)
 {
-    global $db, $lang, $mybb, $thread, $foruminfo;
+    global $db, $lang, $mybb, $thread, $foruminfo, $editscene;
 	$lang->load('inplaytracker');
 
     $foruminfo['parentlist'] = ",".$foruminfo['parentlist'].",";   
     $all_forums = $mybb->settings['inplaytracker_inplay'].",".$mybb->settings['inplaytracker_archive'];
     $selectedforums = explode(",", $all_forums);
+    $editscene = "";
 
     foreach($selectedforums as $selected) {
         if(preg_match("/,$selected,/i", $foruminfo['parentlist'])) {
@@ -649,6 +786,9 @@ function inplaytracker_forumdisplay(&$thread)
                 $charakter = get_user($partners['uid']);
                 $taguser = build_profile_link($charakter['username'], $partners['uid']);
                 $partnerusers[] = $taguser;
+				if($partners['uid'] == $mybb->user['uid'] || $mybb->usergroup['cancp'] == "1") {
+					$editscene = "<a href=\"misc.php?action=edit_scene&tid={$thread['tid']}\"><i class=\"fas fa-pencil-alt\"></i></a>";	
+				}
             }
             $partnerusers = implode(" &bull; ", $partnerusers);
             $ipdate = date("d.m.Y", $db->fetch_field($db->simple_select("ipt_scenes", "date", "tid = '{$thread['tid']}'"), "date"));
@@ -826,11 +966,81 @@ function inplaytracker_misc() {
         eval("\$page = \"".$templates->get("inplaytracker_misc")."\";");
         output_page($page);
     }
-    if($mybb->input['action'] == "editscene") {
-        // TODO: Option, dass alle Mitspieler die Infos bearbeiten können einbauen
-        eval("\$page = \"".$templates->get("inplaytracker_editscene")."\";");
-        output_page($page);
-    }
+
+    if($mybb->input['action'] == "edit_scene") {
+		$tid = $mybb->input['tid'];
+		$uid = $mybb->user['uid'];
+		$thread = get_thread($tid);
+		
+		// get scene to thread
+		$query = $db->simple_select("ipt_scenes", "*", "tid = '$tid'");
+		$scene = $db->fetch_array($query);
+		
+		// check if user is involved in scene
+		$check = $db->fetch_field($db->query("SELECT spid FROM ".TABLE_PREFIX."ipt_scenes_partners WHERE tid = '$tid' AND uid = '$uid'"), "spid");
+		if(!$check && !$mybb->usergroup['cancp']) {
+			error_no_permission();
+		}
+		
+		// format date
+		$sid = $scene['sid'];
+		$scene['date'] = date("Y-m-d", $scene['date']);
+		
+		// get post partners
+        $query = $db->simple_select("ipt_scenes_partners", "uid", "tid='$tid'");
+        $partners = [];
+        while($result = $db->fetch_array($query)) {
+        	$tagged_user = get_user($result['uid']);
+            $partners[] = $tagged_user['username'];
+        }
+		$partners = implode(",", $partners);
+		
+            // is this thread public?
+            $private_bit = "";
+            $private = array("0" => "{$lang->ipt_newthread_private_closed}", "1" => "{$lang->ipt_newthread_private_open}");
+            foreach($private as $key => $value) {
+                $selected = "";
+                if($key == $scene['private']) {
+                    $selected = "selected";
+                }
+                $private_bit .= "<option value=\"{$key}\" {$selected}>{$value}</option>";
+            }
+		
+		eval("\$page = \"".$templates->get("inplaytracker_editscene")."\";");
+		output_page($page);
+	}
+	
+	if($mybb->input['action'] == "do_editscene") {
+		$tid = $mybb->input['tid'];
+		if(!empty($mybb->get_input('partners'))) {
+			$db->delete_query("ipt_scenes_partners", "tid='{$tid}'");
+
+			$partners_new = explode(",", $mybb->get_input('partners'));
+			$partners_new = array_map("trim", $partners_new);
+			foreach($partners_new as $partner) {
+				$partner = $db->escape_string($partner);
+				$partner_uid = $db->fetch_field($db->query("SELECT uid FROM ".TABLE_PREFIX."users WHERE username = '$partner'"), "uid");
+				$new_record = [
+					"tid" => (int)$tid,
+					"uid" => (int)$partner_uid
+				];
+				$db->insert_query("ipt_scenes_partners", $new_record);
+			}
+
+			$ipdate = strtotime($mybb->get_input('ipdate'));
+
+			$new_record = [
+				"date" => $ipdate,
+				"location" => $db->escape_string($mybb->get_input('iport')),
+				"shortdesc" => $db->escape_string($mybb->get_input('description')),
+				"open" => (int)$mybb->get_input('private')
+			];
+
+			$db->update_query("ipt_scenes", $new_record, "tid='{$tid}'");
+			redirect("showthread.php?tid={$tid}");
+			
+		}
+	}
 }
 
 function inplaytracker_do_newreply()
