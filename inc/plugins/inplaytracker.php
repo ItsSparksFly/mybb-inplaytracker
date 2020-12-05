@@ -270,24 +270,22 @@ function inplaytracker_activate()
 
     $inplaytracker_member_profile = [
         'title'        => 'inplaytracker_member_profile',
-        'template'    => $db->escape_string(''),
-        'sid'        => '-1',
-        'version'    => '			<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
+        'template'    => $db->escape_string('<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
         <tr>
             <td colspan="2" class="thead"><strong>{$lang->inplaytracker}</strong></td>
         </tr>
         <tr>
             <td class="trow1">{$scenes_bit}</td>
         </tr>
-        </table>',
+        </table>'),
+        'sid'        => '-1',
+        'version'    => '',
         'dateline'    => TIME_NOW
     ];
 
     $inplaytracker_member_profile_bit = [
         'title'        => 'inplaytracker_member_profile_bit',
-        'template'    => $db->escape_string(''),
-        'sid'        => '-1',
-        'version'    => '<div class="ipbit">
+        'template'    => $db->escape_string('<div class="ipbit">
         <table cellspacing="2px" cellpadding="0px" width="100%" style="font-size: 9px;">
             <tr>
                 <td class="date">
@@ -311,7 +309,9 @@ function inplaytracker_activate()
                 </td>
             </tr>		
         </table>
-    </div>',
+    </div>'),
+        'sid'        => '-1',
+        'version'    => '',
         'dateline'    => TIME_NOW
     ];
 
@@ -864,8 +864,7 @@ function inplaytracker_misc() {
 
     $mybb->input['action'] = $mybb->get_input('action');
     if($mybb->input['action'] == "do_upgrade") {
-
-        $query = $db->simple_query("threads", "*", "partners != ''");
+        $query = $db->simple_select("threads", "*", "partners != ''");
         while($thread = $db->fetch_array($query)) {
             $partners = explode(",", $thread['partners']);
             foreach($partners as $partner) {
@@ -879,7 +878,7 @@ function inplaytracker_misc() {
             $insert_array = [];
             $insert_array = [
               "tid" => $thread['tid'],
-              "location" => $thread['iport'],
+              "location" => $db->escape_string($thread['iport']),
               "date" => $thread['ipdate']
             ];
             $db->insert_query("ipt_scenes", $insert_array);
