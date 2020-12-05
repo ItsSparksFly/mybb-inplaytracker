@@ -5,10 +5,10 @@ Der <strong>Inplaytracker</strong> ist ein für Rollenspielzwecke in PHP und jsc
 Der <em>Inplaytracker</em> ermöglicht es Mitgliedern des Forums, andere Mitglieder bei Erstellen eines neuen Threads zu "taggen" - diese erhalten über das Plugin <a href="https://github.com/MyBBStuff/MyAlerts" target="_blank">MyAlerts</a> im Anschluss eine Benachrichtigung. Darüber hinaus lassen sich Spieldatum und Spielort, sowie eine kurze Beschreibung des Spielgeschehens für diesen Thread hinterlegen. Eine Übersicht aller getaggten Szenen liefert das Plugin ebenso mit wie einen nummerische Angabe aller offenen Szenen im Headerbereich des Forums.
 
 # Empfohlene Plugins
-<a href="https://github.com/MyBBStuff/MyAlerts" target="_blank">MyAlerts</a> von euanT
-<a href="http://doylecc.altervista.org/bb/downloads.php?dlid=4&cat=1" target="_blank">Enhanced Account Switcher</a> von doylecc
-<a href="https://github.com/aheartforspinach/Archivierung" target="_blank">Themenarchivierung</a> von aheartforspinach
-<a href="https://github.com/aheartforspinach/Posting-Erinnerung" target="_blank">Posting-Erinnerung von aheartforspinach</a>
+<a href="https://github.com/MyBBStuff/MyAlerts" target="_blank">MyAlerts</a> von euanT<br />
+<a href="http://doylecc.altervista.org/bb/downloads.php?dlid=4&cat=1" target="_blank">Enhanced Account Switcher</a> von doylecc<br />
+<a href="https://github.com/aheartforspinach/Archivierung" target="_blank">Themenarchivierung</a> von aheartforspinach<br />
+<a href="https://github.com/aheartforspinach/Posting-Erinnerung" target="_blank">Posting-Erinnerung</a> von aheartforspinach<br />
 
 
 # Upgrade
