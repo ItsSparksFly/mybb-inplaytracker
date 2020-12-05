@@ -46,7 +46,6 @@ function inplaytracker_install()
         `tid` int(11) NOT NULL,
         `location` varchar(140) NOT NULL,
         `date` varchar(140) NOT NULL,
-        `open` tinyint NOT NULL, 
         `shortdesc` varchar(140) NOT NULL,
         PRIMARY KEY (`sid`),
         KEY `lid` (`sid`)
@@ -61,7 +60,7 @@ function inplaytracker_install()
      ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1");
 
      $setting_group = [
-		'name' => 'inplaytracker',
+		'name' => 'ipt',
 		'title' => $lang->ipt_name,
 		'description' => $lang->ipt_settings,
 		'disporder' => 5,
@@ -71,13 +70,13 @@ function inplaytracker_install()
 	$gid = $db->insert_query("settinggroups", $setting_group);
 	
 	$setting_array = [
-		'inplaytracker_inplay' => [
+		'ipt_inplay' => [
 			'title' => $lang->ipt_inplay,
 			'description' => $lang->ipt_inplay_description,
 			'optionscode' => 'forumselect',
 			'disporder' => 1
         ],
-        'inplaytracker_archive' => [
+        'ipt_archive' => [
 			'title' => $lang->ipt_archive,
 			'description' => $lang->ipt_archive_description,
 			'optionscode' => 'forumselect',
@@ -115,8 +114,8 @@ function inplaytracker_uninstall()
     $db->query("DROP TABLE ".TABLE_PREFIX."ipt_scenes");
     $db->query("DROP TABLE ".TABLE_PREFIX."ipt_scenes_partners");
 
-	$db->delete_query('settings', "name IN ('inplaytracker_inplay', 'inplaytracker_archive')");
-	$db->delete_query('settinggroups', "name = 'inplaytracker'");
+	$db->delete_query('settings', "name IN ('ipt_inplay', 'ipt_archive')");
+	$db->delete_query('settinggroups', "name = 'ipt'");
 
 	rebuild_settings();
 
@@ -181,18 +180,6 @@ function inplaytracker_activate()
             </td>
             <td class="trow1">
                 <input type="text" class="textbox" name="iport" size="40" maxlength="155" value="{$iport}" /> 
-            </td>
-        </tr>
-        <tr>
-            <td class="trow1" width="20%">
-                <strong>{$lang->ipt_newthread_private}</strong>
-            </td>
-            <td class="trow1">
-                <span class="smalltext">
-                <select name="private" class="select">{$private_bit}</select>
-                <br />
-                 {$lang->ipt_newthread_private_description}
-                </span>
             </td>
         </tr>
         <tr>
@@ -467,18 +454,6 @@ function inplaytracker_activate()
                 </tr>
                 <tr>
                     <td class="trow1" width="20%">
-                        <strong>{$lang->ipt_newthread_private}</strong>
-                    </td>
-                    <td class="trow1">
-                        <span class="smalltext">
-                        <select name="private" class="select">{$private_bit}</select>
-                        <br />
-                         {$lang->ipt_newthread_private_description}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="trow1" width="20%">
                         <strong>{$lang->ipt_newthread_description}</strong>
                     </td>
                     <td class="trow1">
@@ -607,7 +582,7 @@ function inplaytracker_newthread()
 
     // insert inplaytracker options
     $forum['parentlist'] = ",".$forum['parentlist'].",";   
-    $selectedforums = explode(",", $mybb->settings['inplaytracker_inplay']);
+    $selectedforums = explode(",", $mybb->settings['ipt_inplay']);
 
     foreach($selectedforums as $selected) {
         if(preg_match("/,$selected,/i", $forum['parentlist'])) {
@@ -617,18 +592,6 @@ function inplaytracker_newthread()
                 $iport = htmlspecialchars_uni($mybb->get_input('iport'));
                 $ipdescription = htmlspecialchars_uni($mybb->get_input('description'));
                 $ipdate = $mybb->get_input('ipdate');
-                $ipprivate = (int)$mybb->get_input('private');
-            }
-
-            // is this thread public?
-            $private_bit = "";
-            $private = array("0" => "{$lang->ipt_newthread_private_closed}", "1" => "{$lang->ipt_newthread_private_open}");
-            foreach($private as $key => $value) {
-                $selected = "";
-                if($key == $ipprivate) {
-                    $selected = "selected";
-                }
-                $private_bit .= "<option value=\"{$key}\" {$selected}>{$value}</option>";
             }
            eval("\$newthread_inplaytracker = \"".$templates->get("inplaytracker_newthread")."\";");
         }
@@ -646,7 +609,6 @@ function inplaytracker_do_newthread() {
             "date" => $ipdate,
             "location" => $db->escape_string($mybb->get_input('iport')),
             "shortdesc" => $db->escape_string($mybb->get_input('description')),
-            "open" => (int)$mybb->get_input('private'),
             "tid" => (int)$tid
         ];
         $db->insert_query("ipt_scenes", $new_record);
@@ -688,7 +650,7 @@ function inplaytracker_editpost() {
 
     // insert inplaytracker options
     $forum['parentlist'] = ",".$forum['parentlist'].",";   
-    $all_forums = $mybb->settings['inplaytracker_inplay'].",".$mybb->settings['inplaytracker_archive'];
+    $all_forums = $mybb->settings['ipt_inplay'].",".$mybb->settings['ipt_archive'];
     $selectedforums = explode(",", $all_forums);
 
     foreach($selectedforums as $selected) {
@@ -715,15 +677,6 @@ function inplaytracker_editpost() {
                 $ipdate = date("Y-m-d", $scene['date']);
                 $iport = htmlspecialchars_uni($scene['location']);
                 $ipdescription = htmlspecialchars_uni($scene['shortdesc']);
-            }
-
-            $private = array("0" => "{$lang->ipt_newthread_private_closed}", "1" => "{$lang->ipt_newthread_private_open}");
-            foreach($private as $key => $value) {
-                $checked = "";
-                if($scene['open'] == $key) {
-                    $checked = "selected=\"selected\"";
-                }
-                $private_bit .= "<option value=\"$key\" {$checked}>$value</option>";
             }
             eval("\$editpost_inplaytracker = \"".$templates->get("inplaytracker_newthread")."\";");
             }
@@ -760,8 +713,7 @@ function inplaytracker_do_editpost()
         $new_record = [
             "date" => $ipdate,
             "location" => $db->escape_string($mybb->get_input('iport')),
-            "shortdesc" => $db->escape_string($mybb->get_input('description')),
-            "open" => (int)$mybb->get_input('private')
+            "shortdesc" => $db->escape_string($mybb->get_input('description'))
         ];
 
         $db->update_query("ipt_scenes", $new_record, "tid='{$tid}'");
@@ -774,7 +726,7 @@ function inplaytracker_forumdisplay(&$thread)
 	$lang->load('inplaytracker');
 
     $foruminfo['parentlist'] = ",".$foruminfo['parentlist'].",";   
-    $all_forums = $mybb->settings['inplaytracker_inplay'].",".$mybb->settings['inplaytracker_archive'];
+    $all_forums = $mybb->settings['ipt_inplay'].",".$mybb->settings['ipt_archive'];
     $selectedforums = explode(",", $all_forums);
     $editscene = "";
 
@@ -807,7 +759,7 @@ function inplaytracker_postbit(&$post) {
     $thread = get_thread($tid);
     $foruminfo = get_forum($thread['fid']);
     $foruminfo['parentlist'] = ",".$foruminfo['parentlist'].",";   
-    $all_forums = $mybb->settings['inplaytracker_inplay'].",".$mybb->settings['inplaytracker_archive'];
+    $all_forums = $mybb->settings['ipt_inplay'].",".$mybb->settings['ipt_archive'];
     $selectedforums = explode(",", $all_forums);
 
     foreach($selectedforums as $selected) {
@@ -912,6 +864,48 @@ function inplaytracker_misc() {
     
 
     $mybb->input['action'] = $mybb->get_input('action');
+    if($mybb->input['action'] == "do_upgrade") {
+
+        $query = $db->simple_query("threads", "*", "partners != ''");
+        while($thread = $db->fetch_array($query)) {
+            $partners = explode(",", $thread['partners']);
+            foreach($partners as $partner) {
+                $insert_array = [
+                    "tid" => (int)$thread['tid'],
+                    "uid" => (int)$partner
+                ];
+                $db->insert_query("ipt_scenes_partners", $insert_array);
+            }
+
+            $insert_array = [];
+            $insert_array = [
+              "tid" => $thread['tid'];
+              "location" => $thread['iport'],
+              "date" => $thread['ipdate']
+            ];
+            $db->insert_query("ipt_scenes", $insert_array);
+        }
+
+        // delete old tables
+        $columns = [ "partners", "ipdate", "iport", "ipdaytime", "openscene", "postorder" ];
+        $tables = [ "threads", "posts" ];
+        foreach($columns as $column) {
+            foreach($tables as $table) {
+                if($db->field_exists($column, $table))
+                {
+                $db->drop_column($table, $column);
+                }
+            }         
+        }
+
+        // delete old settings
+        $db->delete_query('settings', "name LIKE '%inplaytracker%'");
+        $db->delete_query('settinggroups', "name = 'inplaytracker'");
+        rebuild_settings();
+
+        redirect("index.php");
+    }
+
 	if($mybb->input['action'] == "inplaytracker") {
         // get all users that are linked via account switcher
         $as_uid = $db->fetch_field($db->simple_select("users", "as_uid", "uid = '{$mybb->user['uid']}'"), "as_uid");
@@ -995,17 +989,6 @@ function inplaytracker_misc() {
         }
 		$partners = implode(",", $partners);
 		
-            // is this thread public?
-            $private_bit = "";
-            $private = array("0" => "{$lang->ipt_newthread_private_closed}", "1" => "{$lang->ipt_newthread_private_open}");
-            foreach($private as $key => $value) {
-                $selected = "";
-                if($key == $scene['private']) {
-                    $selected = "selected";
-                }
-                $private_bit .= "<option value=\"{$key}\" {$selected}>{$value}</option>";
-            }
-		
 		eval("\$page = \"".$templates->get("inplaytracker_editscene")."\";");
 		output_page($page);
 	}
@@ -1032,8 +1015,7 @@ function inplaytracker_misc() {
 			$new_record = [
 				"date" => $ipdate,
 				"location" => $db->escape_string($mybb->get_input('iport')),
-				"shortdesc" => $db->escape_string($mybb->get_input('description')),
-				"open" => (int)$mybb->get_input('private')
+				"shortdesc" => $db->escape_string($mybb->get_input('description'))
 			];
 
 			$db->update_query("ipt_scenes", $new_record, "tid='{$tid}'");
@@ -1049,7 +1031,7 @@ function inplaytracker_do_newreply()
 	$lang->load('inplaytracker');
 
     $forum['parentlist'] = ",".$forum['parentlist'].",";   
-    $all_forums = $mybb->settings['inplaytracker_inplay'];
+    $all_forums = $mybb->settings['ipt_inplay'];
     $selectedforums = explode(",", $all_forums);
     foreach($selectedforums as $selected) {
         if(preg_match("/,$selected,/i", $forum['parentlist'])) {   
