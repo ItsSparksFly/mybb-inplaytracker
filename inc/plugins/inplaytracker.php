@@ -120,7 +120,6 @@ function inplaytracker_uninstall()
 	rebuild_settings();
 
 }
-
 function inplaytracker_activate()
 {
     global $db, $cache;
@@ -412,8 +411,55 @@ function inplaytracker_activate()
         'title'        => 'inplaytracker_editscene',
         'template'    => $db->escape_string('<html>
         <head>
-        <title>{$mybb->settings['bbname']} - {$lang->ipt}</title>
+        <title>{$mybb->settings[\'bbname\']} - {$lang->ipt}</title>
         {$headerinclude}
+        <link rel="stylesheet" href="{$mybb->asset_url}/jscripts/select2/select2.css?ver=1807">
+        <script type="text/javascript" src="{$mybb->asset_url}/jscripts/select2/select2.min.js?ver=1806"></script>
+        <script type="text/javascript">
+        <!--
+        if(use_xmlhttprequest == "1")
+        {
+            MyBB.select2();
+            $("#partners").select2({
+                placeholder: "{$lang->search_user}",
+                minimumInputLength: 2,
+                maximumSelectionSize: \'\',
+                multiple: true,
+                ajax: { // instead of writing the function to execute the request we use Select2\'s convenient helper
+                    url: "xmlhttp.php?action=get_users",
+                    dataType: \'json\',
+                    data: function (term, page) {
+                        return {
+                            query: term, // search term
+                        };
+                    },
+                    results: function (data, page) { // parse the results into the format expected by Select2.
+                        // since we are using custom formatting functions we do not need to alter remote JSON data
+                        return {results: data};
+                    }
+                },
+                initSelection: function(element, callback) {
+                    var query = $(element).val();
+                    if (query !== "") {
+                        var newqueries = [];
+                        exp_queries = query.split(",");
+                        $.each(exp_queries, function(index, value ){
+                            if(value.replace(/\s/g, \'\') != "")
+                            {
+                                var newquery = {
+                                    id: value.replace(/,\s?/g, ","),
+                                    text: value.replace(/,\s?/g, ",")
+                                };
+                                newqueries.push(newquery);
+                            }
+                        });
+                        callback(newqueries);
+                    }
+                }
+            })
+        }
+        // -->
+        </script>
         </head>
         <body>
         {$header}
@@ -477,53 +523,6 @@ function inplaytracker_activate()
         </table>
         </form>
         {$footer}
-                <link rel="stylesheet" href="{$mybb->asset_url}/jscripts/select2/select2.css?ver=1807">
-                <script type="text/javascript" src="{$mybb->asset_url}/jscripts/select2/select2.min.js?ver=1806"></script>
-                <script type="text/javascript">
-                <!--
-                if(use_xmlhttprequest == "1")
-                {
-                    MyBB.select2();
-                    $("#partners").select2({
-                        placeholder: "{$lang->search_user}",
-                        minimumInputLength: 2,
-                        maximumSelectionSize: '',
-                        multiple: true,
-                        ajax: { // instead of writing the function to execute the request we use Select2\'s convenient helper
-                            url: "xmlhttp.php?action=get_users",
-                            dataType: \'json\',
-                            data: function (term, page) {
-                                return {
-                                    query: term, // search term
-                                };
-                            },
-                            results: function (data, page) { // parse the results into the format expected by Select2.
-                                // since we are using custom formatting functions we do not need to alter remote JSON data
-                                return {results: data};
-                            }
-                        },
-                        initSelection: function(element, callback) {
-                            var query = $(element).val();
-                            if (query !== "") {
-                                var newqueries = [];
-                                exp_queries = query.split(",");
-                                $.each(exp_queries, function(index, value ){
-                                    if(value.replace(/\s/g, '') != "")
-                                    {
-                                        var newquery = {
-                                            id: value.replace(/,\s?/g, ","),
-                                            text: value.replace(/,\s?/g, ",")
-                                        };
-                                        newqueries.push(newquery);
-                                    }
-                                });
-                                callback(newqueries);
-                            }
-                        }
-                    })
-                }
-                // -->
-                </script>
         </body>
         </html>'),
         'sid'        => '-1',
@@ -879,7 +878,7 @@ function inplaytracker_misc() {
 
             $insert_array = [];
             $insert_array = [
-              "tid" => $thread['tid'];
+              "tid" => $thread['tid'],
               "location" => $thread['iport'],
               "date" => $thread['ipdate']
             ];
@@ -1179,5 +1178,4 @@ function inplaytracker_alerts() {
 	}
 
 }
-
 ?>
