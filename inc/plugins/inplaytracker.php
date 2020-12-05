@@ -864,7 +864,7 @@ function inplaytracker_misc() {
 
     $mybb->input['action'] = $mybb->get_input('action');
     if($mybb->input['action'] == "do_upgrade") {
-        $query = $db->simple_select("threads", "*", "partners != ''");
+        $query = $db->simple_select("threads", "*", "partners != '' OR partners != '0'");
         while($thread = $db->fetch_array($query)) {
             $partners = explode(",", $thread['partners']);
             foreach($partners as $partner) {
