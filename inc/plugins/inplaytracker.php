@@ -360,14 +360,9 @@ function inplaytracker_activate()
 
     $inplaytracker_misc_bit = [
         'title'        => 'inplaytracker_misc_bit',
-        'template'    => $db->escape_string('	<div id="forumdisplay">
-		<div id="filmstreifen"></div>
-		<div id="streifen"></div>
-		<div class="name">{$user[\'username\']}</div>
-		<div class="description">{$charscenes} {$lang->ipt_header_tracker}, {$charopenscenes} davon offen</div>
-		<div class="line"></div>
-	</div>
-	{$scene_bit}'),
+        'template'    => $db->escape_string('<div class="thead">{$user[\'username\']}</div>
+        <div class="tcat">{$charscenes} {$lang->ipt_header_tracker}, {$charopenscenes} davon offen</div>
+        {$scene_bit}'),
         'sid'        => '-1',
         'version'    => '',
         'dateline'    => TIME_NOW
@@ -380,21 +375,16 @@ function inplaytracker_activate()
             <tr>
                 <td width="60%" valign="middle">
                     <a href="showthread.php?tid={$thread[\'tid\']}" class="threadlink">{$thread[\'subject\']}</a>
-                    <br /><span class="threadauthor">{$thread[\'profilelink\']}</span>
                 </td>
                 <td width="40%" valign="middle" align="right">
-                    <strong>LASTPOST</strong>
                         <table>
             <tr>
-                <td><span class="lastpostname">DATE</span></td>
                 <td><div class="lastpostline" style="width:70px;"></div></td>
                 <td><span class="threadauthor">{$lastpostdate}</span></td>
             </tr>
         </table>
         <table>
             <tr>
-                <td><span class="lastpostname">DIRECTOR</span></td>
-                <td><div class="lastpostline"></div></td>
                 <td><span class="threadauthor"><a href="member.php?action=profile&uid={$thread[\'lastposteruid\']}">{$thread[\'lastposter\']}</a></span></td>
             </tr>
         </table>
