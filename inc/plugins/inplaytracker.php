@@ -46,7 +46,7 @@ function inplaytracker_install()
         `tid` int(11) NOT NULL,
         `location` varchar(140) NOT NULL,
         `date` varchar(140) NOT NULL,
-        `shortdesc` varchar(140) NOT NULL,
+        `shortdesc` varchar(2500) NOT NULL,
         PRIMARY KEY (`sid`),
         KEY `lid` (`sid`)
      ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1");
@@ -187,7 +187,7 @@ function inplaytracker_activate()
             </td>
             <td class="trow1">
                 <span class="smalltext">
-                    <textarea class="textarea" name="description" maxlength="140" style="min-width: 347px; max-width: 100%; height: 80px;">{$ipdescription}</textarea>
+                    <textarea class="textarea" name="description" style="min-width: 347px; max-width: 100%; height: 80px;">{$ipdescription}</textarea>
                 <br />
                  {$lang->ipt_newthread_description_description}
                 </span>
@@ -494,7 +494,7 @@ function inplaytracker_activate()
                     </td>
                     <td class="trow1">
                         <span class="smalltext">
-                            <textarea class="textarea" name="description" maxlength="140" style="min-width: 347px; max-width: 100%; height: 80px;">{$scene[\'shortdesc\']}</textarea>
+                            <textarea class="textarea" name="description" style="min-width: 347px; max-width: 100%; height: 80px;">{$scene[\'shortdesc\']}</textarea>
                         <br />
                          {$lang->ipt_newthread_description_description}
                         </span>
