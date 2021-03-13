@@ -732,8 +732,15 @@ function inplaytracker_forumdisplay(&$thread)
 				}
             }
             $partnerusers = implode(" &bull; ", $partnerusers);
-            $ipdate = date("d.m.Y", $db->fetch_field($db->simple_select("ipt_scenes", "date", "tid = '{$thread['tid']}'"), "date"));
+            $ipddate = $db->fetch_field($db->simple_select("ipt_scenes", "date", "tid = '{$thread['tid']}'"), "date");
             $ipdescription = $db->fetch_field($db->simple_select("ipt_scenes", "shortdesc", "tid = '{$thread['tid']}'"), "shortdesc");
+            if(!empty($ipddate)) {
+                $ipdate = date("d.m.Y", $ipddate);
+                $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers <br /> <b>{$lang->ipt_forumdisplay_date}:</b> $ipdate<br />
+                <b>{$ipdescription}</b>";
+            } else {
+                $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers";               
+            }
             $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers <br /> <b>{$lang->ipt_forumdisplay_date}:</b> $ipdate<br />
             <b>{$ipdescription}</b>";
             return $thread;
