@@ -251,7 +251,6 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    // TODO: bisschen aufhübschen?
     $inplaytracker_postbit = [
         'title'        => 'inplaytracker_postbit',
         'template'    => $db->escape_string('<br /><br />
@@ -833,7 +832,7 @@ function inplaytracker_global() {
         while($scenelist = $db->fetch_array($query_2)) {
             // get thread infos
             $thread = get_thread($scenelist['tid']);
-            if($thread && $thread['visibility'] == "1") {
+            if($thread && $thread['visible'] == "1") {
                 $lastposter = $thread['lastposteruid'];
                 // get spid matching lastposteruid
                 $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
@@ -920,7 +919,7 @@ function inplaytracker_misc() {
                 $query_3 = $db->simple_select("ipt_scenes", "*", "tid = '{$scenelist['tid']}'");
                 $scene = $db->fetch_array($query_3);
                 $thread = get_thread($scene['tid']);
-                if($thread  && $thread['visibility'] == "1") {
+                if($thread && $thread['visible'] == "1") {
                     $query_4 = $db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'");
                     $partnerusers = [];
                     while($partners = $db->fetch_array($query_4)) {
