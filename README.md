@@ -4,6 +4,81 @@ Der <strong>Inplaytracker</strong> ist ein für Rollenspielzwecke in PHP und jsc
 # Funktionsweise
 Der <em>Inplaytracker</em> ermöglicht es Mitgliedern des Forums, andere Mitglieder bei Erstellen eines neuen Threads zu "taggen" - diese erhalten über das Plugin <a href="https://github.com/MyBBStuff/MyAlerts" target="_blank">MyAlerts</a> im Anschluss eine Benachrichtigung. Darüber hinaus lassen sich Spieldatum und Spielort, sowie eine kurze Beschreibung des Spielgeschehens für diesen Thread hinterlegen. Eine Übersicht aller getaggten Szenen liefert das Plugin ebenso mit wie einen nummerische Angabe aller offenen Szenen im Headerbereich des Forums.
 
+Es kommt mit ein paar Funktionen, die ich euch hier stichpunktartig näher vorstellen möchte:
+
+<ul>
+<li> Einschränkung der Funktionen auf bestimmte Kategorien
+<li> Taggen seiner Mitspieler
+<li> "Inplay-Datum" zur Sortierung von Szenen
+<li> Feld "Spielort" zur besseren Orientierung in Szenen
+<li> Auflistung & Verlinkung der Mitspieler in der Themenübersicht
+<li> MyAlert-Integration bei neu erstellter Szenen
+<li> MyAlert-Integration bei neuer Antwort auf Inplayszene
+<li> Übersicht aller aktiver Szenen mit ausstehenden Posts
+<li>Verknüpfung über den Accountswitcher
+<li> Festlegen einer Posting-Reihenfolge (wird bei Übersicht offener Posts beachtet)
+<li> Anzeige der Gesamtanzahl (offener) Szenen im Header
+<li> Szenentracker im Profil mit Zählung von Posts / sortiert nach Datum 
+<li> Aufsplittung von archivierten und aktuellen Szenen im Profil
+<li> Alle Mitspieler können Szenen-Informationen bearbeiten
+</ul>
+
+# Plugin funktionsfähig machen
+<ul>
+<li>Die Plugin-Datei ladet ihr in den angegebenen Ordner <b>inc/plugins</b> hoch.
+<li>Die Language-Dateien ladet ihr in den entsprechenden Sprachordner.
+<li>Das Plugin muss nun im Admin CP unter <b>Konfiguration - Plugins</b> installiert und aktiviert werden
+<li>In den Foreneinstellungen findet ihr nun - ganz unten - Einstellungen zu "Inplaytracker". Macht dort eure gewünschten Einstellungen.
+</ul>
+
+Das Plugin ist nun einsatzbereit. Solltet ihr schon einiges an eurem Forum gemacht haben, und nicht wie ich im Testdurchlauf ein Default-Theme verwenden, kann es sein, dass nicht alle Variablen eingefügt werden. Sollte euch eine Anzeige fehlen, könnt ihr auf folgende Variablen zurückgreifen:
+
+<blockquote>{$header_inplaytracker}  // Link zur Übersicht der Szenen (header)
+* ruft ipt_header auf
+
+{$member_profile_inplaytracker} // Szenentracker im Profil (member_profile)
+* ruft ipt_member_profile auf
+
+{$newthread_inplaytracker} // Eingabefeld für Postingpartner (newthread)
+* ruft ipt_newthread auf
+
+{$editpost_inplaytracker} // Eingabefeld für Postingpartner (newthread)
+* ruft ipt_newthread auf
+
+{$post['inplaytracker']} // Szenen-Informationen überm Post (postbit, postbit_classic)
+* ruft ipt_postbit auf
+
+{$showthread_inplaytracker} // Szenen-Informationen überm Post (showthread)
+* ruft ipt_showthread auf</blockquote>
+
+# Template-Änderungen
+Folgende Templates werden durch dieses Plugin <i>neu hinzugefügt</i>:
+
+<ul>
+<li>ipt_editscene
+<li>ipt_header
+<li>ipt_member_profile
+<li>ipt_member_profile_bit
+<li>ipt_member_profile_bit_user
+<li>ipt_misc
+<li>ipt_misc_bit 
+<li>ipt_misc_bit_scene 
+<li>ipt_newthread 
+<li>ipt_postbit
+<li>ipt_showthread
+</ul>
+
+Folgende Templates werden durch dieses Plugin <i>bearbeitet</i>:
+<ul>
+<li>header
+<li>member_profile
+<li>newthread
+<li>editpost
+<li>postbit
+<li>postbit_classic
+</ul>
+
+
 # Changelog 
 <strong>2.0 => 3.0 (latest)</strong>
 
