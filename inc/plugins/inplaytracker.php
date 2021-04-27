@@ -296,7 +296,7 @@ function inplaytracker_activate()
             </tr>
             <tr>
                 <td class="date">
-                    Cast
+                    {$lang->ipt_newthread_partners}
                 </td>
                 <td class="players">
                     {$user_bit}
@@ -825,10 +825,17 @@ function inplaytracker_global() {
     if(empty($as_uid)) {
         $as_uid = $mybb->user['uid'];
     }
-    $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$mybb->user['uid']}'");
+
+    $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$as_uid}'");
     while($userlist = $db->fetch_array($query)) {
         // get all scenes for this uid...
-        $query_2 = $db->simple_select("ipt_scenes_partners", "tid", "uid = '{$userlist['uid']}'");
+		$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid FROM ".TABLE_PREFIX."ipt_scenes_partners
+		LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
+		LEFT JOIN ".TABLE_PREFIX."forums ON ".TABLE_PREFIX."forums.fid = ".TABLE_PREFIX."threads.fid
+		WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['inplaytracker_inplay']})
+		AND ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
+		AND ".TABLE_PREFIX."threads.visible = '1'
+		");
         while($scenelist = $db->fetch_array($query_2)) {
             // get thread infos
             $thread = get_thread($scenelist['tid']);
@@ -903,15 +910,25 @@ function inplaytracker_misc() {
 	if($mybb->input['action'] == "inplaytracker") {
         // get all users that are linked via account switcher
         $as_uid = $db->fetch_field($db->simple_select("users", "as_uid", "uid = '{$mybb->user['uid']}'"), "as_uid");
+
         if(empty($as_uid)) {
             $as_uid = $mybb->user['uid'];
         }
-        $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$mybb->user['uid']}'");
+    
+        $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$as_uid}'");
         $user_bit = "";
         while($userlist = $db->fetch_array($query)) {  
             // get all scenes for this uid...
             $user = get_user($userlist['uid']);
-            $query_2 = $db->simple_select("ipt_scenes_partners", "tid", "uid = '{$userlist['uid']}'");
+			$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid FROM ".TABLE_PREFIX."ipt_scenes_partners
+			LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
+			LEFT JOIN ".TABLE_PREFIX."forums ON ".TABLE_PREFIX."forums.fid = ".TABLE_PREFIX."threads.fid
+            LEFT JOIN ".TABLE_PREFIX."ipt_scenes ON ".TABLE_PREFIX."ipt_scenes.tid = ".TABLE_PREFIX."ipt_scenes_partners.tid
+			WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['inplaytracker_inplay']})
+			AND ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
+			AND ".TABLE_PREFIX."threads.visible = '1'
+			ORDER BY date ASC
+			");
             $scene_bit = "";
             (int)$charscenes = 0;
             (int)$charopenscenes = 0;
