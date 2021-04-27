@@ -832,7 +832,7 @@ function inplaytracker_global() {
 		$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid FROM ".TABLE_PREFIX."ipt_scenes_partners
 		LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
 		LEFT JOIN ".TABLE_PREFIX."forums ON ".TABLE_PREFIX."forums.fid = ".TABLE_PREFIX."threads.fid
-		WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['inplaytracker_inplay']})
+		WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['ipt_inplay']})
 		AND ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
 		AND ".TABLE_PREFIX."threads.visible = '1'
 		");
@@ -924,7 +924,7 @@ function inplaytracker_misc() {
 			LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
 			LEFT JOIN ".TABLE_PREFIX."forums ON ".TABLE_PREFIX."forums.fid = ".TABLE_PREFIX."threads.fid
             LEFT JOIN ".TABLE_PREFIX."ipt_scenes ON ".TABLE_PREFIX."ipt_scenes.tid = ".TABLE_PREFIX."ipt_scenes_partners.tid
-			WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['inplaytracker_inplay']})
+			WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['ipt_inplay']})
 			AND ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
 			AND ".TABLE_PREFIX."threads.visible = '1'
 			ORDER BY date ASC
