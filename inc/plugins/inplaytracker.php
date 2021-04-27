@@ -754,20 +754,20 @@ function inplaytracker_postbit(&$post) {
     $thread = get_thread($tid);
     $foruminfo = get_forum($thread['fid']);
     $foruminfo['parentlist'] = ",".$foruminfo['parentlist'].",";   
-    $all_forums = $mybb->settings['inplaytracker_inplay'].",".$mybb->settings['inplaytracker_archive'];
+    $all_forums = $mybb->settings['ipt_inplay'].",".$mybb->settings['ipt_archive'];
     $selectedforums = explode(",", $all_forums);
 
     foreach($selectedforums as $selected) {
         if(preg_match("/,$selected,/i", $foruminfo['parentlist'])) {   
-                $query = $db->simple_select("ipt_scenes", "*", "tid='{$tid}'");
-                $scene = $db->fetch_array($query);
-                $scene['playdate'] = date("d.m.Y", $scene['date']);
-                $query = $db->simple_select("ipt_scenes_partners", "uid", "tid='{$tid}'");
-                while($partners = $db->fetch_array($query)) {
-                    $partner = get_user($partners['uid']);
-                    $username = format_name($partner['username'], $partner['usergroup'], $partner['displaygroup']);
-                    $partnerlink = build_profile_link($username, $partner['uid']);
-                    $partnerlist .= "&nbsp; &nbsp;".$partnerlink;
+            $query = $db->simple_select("ipt_scenes", "*", "tid='{$tid}'");
+            $scene = $db->fetch_array($query);
+            $scene['playdate'] = date("d.m.Y", $scene['date']);
+            $query = $db->simple_select("ipt_scenes_partners", "uid", "tid='{$tid}'");
+            while($partners = $db->fetch_array($query)) {
+                $partner = get_user($partners['uid']);
+                $username = format_name($partner['username'], $partner['usergroup'], $partner['displaygroup']);
+                $partnerlink = build_profile_link($username, $partner['uid']);
+                $partnerlist .= "&nbsp; &nbsp;".$partnerlink;
             }
             eval("\$post['inplaytracker'] = \"".$templates->get("inplaytracker_postbit")."\";");
             return $post;
