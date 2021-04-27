@@ -13,6 +13,7 @@ $plugins->add_hook("editpost_do_editpost_end", "ipt_do_editpost");
 $plugins->add_hook("forumdisplay_thread_end", "ipt_forumdisplay");
 $plugins->add_hook("postbit", "ipt_postbit");
 $plugins->add_hook("member_profile_end", "ipt_profile");
+$plugins->add_hook("showthread_start", "ipt_showthread");
 $plugins->add_hook("global_intermediate", "ipt_global");
 $plugins->add_hook("misc_start", "ipt_misc");
 $plugins->add_hook("newreply_do_newreply_end", "ipt_do_newreply");
@@ -406,7 +407,7 @@ function ipt_activate()
 
 	$ipt_showthread = [
 		'title'		=> 'ipt_showthread',
-		'template'	=> $db->escape_string('<li class="printable"><a href="misc.php?action=edit_scene&tid={$thread[\'tid\']}">{$lang->ipt_editscene}</a></li>'),
+		'template'	=> $db->escape_string('<li class="sendthread"><a href="misc.php?action=edit_scene&tid={$thread[\'tid\']}">{$lang->ipt_editscene}</a></li>'),
 		'sid'		=> '-1',
 		'version'	=> '',
 		'dateline'	=> TIME_NOW
