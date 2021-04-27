@@ -763,8 +763,6 @@ function ipt_forumdisplay(&$thread)
             } else {
                 $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers";               
             }
-            $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers <br /> <b>{$lang->ipt_forumdisplay_date}:</b> $ipdate<br />
-            <b>{$ipdescription}</b>";
             return $thread;
         }
     } 
