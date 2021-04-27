@@ -23,7 +23,7 @@ if(class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
 function ipt_info()
 {
 	global $lang;
-	$lang->load('inplaytracker');
+	$lang->load('ipt');
 	
 	return array(
 		"name"			=> $lang->ipt_name,
@@ -39,7 +39,7 @@ function ipt_info()
 function ipt_install()
 {
     global $db, $lang;
-    $lang->load('inplaytracker');
+    $lang->load('ipt');
 
     $db->query("CREATE TABLE ".TABLE_PREFIX."ipt_scenes (
         `sid` int(11) NOT NULL AUTO_INCREMENT,
@@ -271,10 +271,18 @@ function ipt_activate()
         'title'        => 'ipt_member_profile',
         'template'    => $db->escape_string('<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
         <tr>
-            <td colspan="2" class="thead"><strong>{$lang->inplaytracker}</strong></td>
+            <td colspan="2" class="thead"><strong>{$lang->ipt}</strong></td>
         </tr>
         <tr>
             <td class="trow1">{$scenes_bit}</td>
+        </tr>
+        </table>
+        <table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
+        <tr>
+            <td colspan="2" class="thead"><strong>{$lang->ipt_archive}</strong></td>
+        </tr>
+        <tr>
+            <td class="trow1">{$scenes_archive_bit}</td>
         </tr>
         </table>'),
         'sid'        => '-1',
@@ -564,7 +572,7 @@ function ipt_deactivate()
 function ipt_newthread()
 {
     global $mybb, $lang, $templates, $post_errors, $forum, $newthread_inplaytracker;
-    $lang->load('inplaytracker');
+    $lang->load('ipt');
 
     $newthread_inplaytracker = "";
 
@@ -632,7 +640,7 @@ function ipt_do_newthread() {
 function ipt_editpost() {
 
     global $mybb, $db, $lang, $templates, $post_errors, $forum, $thread, $pid, $editpost_inplaytracker;
-    $lang->load('inplaytracker');
+    $lang->load('ipt');
     
     $editpost_inplaytracker = "";
 
@@ -711,7 +719,7 @@ function ipt_do_editpost()
 function ipt_forumdisplay(&$thread)
 {
     global $db, $lang, $mybb, $thread, $foruminfo, $editscene;
-	$lang->load('inplaytracker');
+	$lang->load('ipt');
 
     $foruminfo['parentlist'] = ",".$foruminfo['parentlist'].",";   
     $all_forums = $mybb->settings['ipt_inplay'].",".$mybb->settings['ipt_archive'];
@@ -749,7 +757,7 @@ function ipt_forumdisplay(&$thread)
 
 function ipt_postbit(&$post) {
     global $db, $mybb, $lang, $templates, $pid, $tid;
-    $lang->load("inplaytracker");
+    $lang->load("ipt");
  
     $thread = get_thread($tid);
     $foruminfo = get_forum($thread['fid']);
@@ -777,7 +785,7 @@ function ipt_postbit(&$post) {
 
 function ipt_profile() {
     global $db, $mybb, $lang, $templates, $memprofile, $user_bit, $scenes_bit, $member_profile_inplaytracker;
-    $lang->load('inplaytracker');
+    $lang->load('ipt');
 
     $scenes_bit = "";
     $member_profile_inplaytracker = "";
@@ -790,6 +798,7 @@ function ipt_profile() {
                         ORDER BY date ASC");
     while($scenelist = $db->fetch_array($query)) {
         $thread = get_thread($scenelist['tid']);
+        $forum = get_forum($thread['fid']);
         if($thread) {
             // get infos for scene
             $query_2 = $db->simple_select("ipt_scenes", "*", "tid = '{$thread['tid']}'");
@@ -804,7 +813,20 @@ function ipt_profile() {
                 $partnerlink = build_profile_link($username, $partner['uid']);
                 eval("\$user_bit .= \"".$templates->get("ipt_member_profile_bit_user")."\";");
             }
-            eval("\$scenes_bit .= \"".$templates->get("ipt_member_profile_bit")."\";");
+
+            $isarchive = false;
+            $forum['parentlist'] = ",".$forum['parentlist'].",";  
+            $selectedforums = explode(",", $mybb->settings['ipt_archive']);
+            foreach($selectedforums as $selected) {
+                if(preg_match("/,$selected,/i", $forum['parentlist'])) {
+                    $isarchive = true;
+                }
+            }
+            if($isarchive) {
+                eval("\$scenes_archive_bit .= \"".$templates->get("ipt_member_profile_bit")."\";");
+            } else {
+                eval("\$scenes_bit .= \"".$templates->get("ipt_member_profile_bit")."\";");
+            }
         }
     }
     eval("\$member_profile_inplaytracker = \"".$templates->get("ipt_member_profile")."\";");
@@ -812,7 +834,7 @@ function ipt_profile() {
 
 function ipt_global() {
     global $db, $mybb, $lang, $templates, $header_inplaytracker;
-    $lang->load('inplaytracker');
+    $lang->load('ipt');
     $header_inplaytracker = "";
     $openscenes = 0;
     $countscenes = 0;
@@ -859,7 +881,7 @@ function ipt_global() {
 
 function ipt_misc() {
     global $db, $mybb, $lang, $templates, $headerinclude, $header, $footer;
-    $lang->load('inplaytracker');   
+    $lang->load('ipt');   
     $page = "";
     
 
@@ -1037,7 +1059,7 @@ function ipt_misc() {
 function ipt_do_newreply()
 {
 	global $db, $mybb, $lang, $thread, $forum;
-	$lang->load('inplaytracker');
+	$lang->load('ipt');
 
     $forum['parentlist'] = ",".$forum['parentlist'].",";   
     $all_forums = $mybb->settings['ipt_inplay'];
@@ -1065,7 +1087,7 @@ function ipt_do_newreply()
 
 function ipt_alerts() {
 	global $mybb, $lang;
-	$lang->load('inplaytracker');
+	$lang->load('ipt');
 	/**
 	 * Alert formatter for my custom alert type.
 	 */
