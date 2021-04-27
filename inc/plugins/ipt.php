@@ -6,21 +6,21 @@ if(!defined("IN_MYBB"))
 	die("Direct initialization of this file is not allowed.");
 }
 
-$plugins->add_hook("newthread_start", "inplaytracker_newthread");
-$plugins->add_hook("newthread_do_newthread_end", "inplaytracker_do_newthread");
-$plugins->add_hook("editpost_end", "inplaytracker_editpost");
-$plugins->add_hook("editpost_do_editpost_end", "inplaytracker_do_editpost");
-$plugins->add_hook("forumdisplay_thread_end", "inplaytracker_forumdisplay");
-$plugins->add_hook("postbit", "inplaytracker_postbit");
-$plugins->add_hook("member_profile_end", "inplaytracker_profile");
-$plugins->add_hook("global_intermediate", "inplaytracker_global");
-$plugins->add_hook("misc_start", "inplaytracker_misc");
-$plugins->add_hook("newreply_do_newreply_end", "inplaytracker_do_newreply");
+$plugins->add_hook("newthread_start", "ipt_newthread");
+$plugins->add_hook("newthread_do_newthread_end", "ipt_do_newthread");
+$plugins->add_hook("editpost_end", "ipt_editpost");
+$plugins->add_hook("editpost_do_editpost_end", "ipt_do_editpost");
+$plugins->add_hook("forumdisplay_thread_end", "ipt_forumdisplay");
+$plugins->add_hook("postbit", "ipt_postbit");
+$plugins->add_hook("member_profile_end", "ipt_profile");
+$plugins->add_hook("global_intermediate", "ipt_global");
+$plugins->add_hook("misc_start", "ipt_misc");
+$plugins->add_hook("newreply_do_newreply_end", "ipt_do_newreply");
 if(class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
-	$plugins->add_hook("global_start", "inplaytracker_alerts");
+	$plugins->add_hook("global_start", "ipt_alerts");
 }
 
-function inplaytracker_info()
+function ipt_info()
 {
 	global $lang;
 	$lang->load('inplaytracker');
@@ -36,7 +36,7 @@ function inplaytracker_info()
 	);
 }
 
-function inplaytracker_install()
+function ipt_install()
 {
     global $db, $lang;
     $lang->load('inplaytracker');
@@ -96,7 +96,7 @@ function inplaytracker_install()
 
 }
 
-function inplaytracker_is_installed()
+function ipt_is_installed()
 {
 	global $db;
 	if($db->table_exists("ipt_scenes"))
@@ -107,7 +107,7 @@ function inplaytracker_is_installed()
 	return false;
 }
 
-function inplaytracker_uninstall()
+function ipt_uninstall()
 {
 	global $db;
 
@@ -120,7 +120,7 @@ function inplaytracker_uninstall()
 	rebuild_settings();
 
 }
-function inplaytracker_activate()
+function ipt_activate()
 {
     global $db, $cache;
 
@@ -132,14 +132,14 @@ function inplaytracker_activate()
 		}
 
 		$alertType = new MybbStuff_MyAlerts_Entity_AlertType();
-		$alertType->setCode('inplaytracker_newthread'); // The codename for your alert type. Can be any unique string.
+		$alertType->setCode('ipt_newthread'); // The codename for your alert type. Can be any unique string.
 		$alertType->setEnabled(true);
 		$alertType->setCanBeUserDisabled(true);
 
 		$alertTypeManager->add($alertType);
 
 		$alertType = new MybbStuff_MyAlerts_Entity_AlertType();
-		$alertType->setCode('inplaytracker_newreply'); // The codename for your alert type. Can be any unique string.
+		$alertType->setCode('ipt_newreply'); // The codename for your alert type. Can be any unique string.
 		$alertType->setEnabled(true);
 		$alertType->setCanBeUserDisabled(true);
 
@@ -147,8 +147,8 @@ function inplaytracker_activate()
 	}
     
     // create templates
-    $inplaytracker_newthread = [
-        'title'        => 'inplaytracker_newthread',
+    $ipt_newthread = [
+        'title'        => 'ipt_newthread',
         'template'    => $db->escape_string('<tr>
         <td class="tcat" colspan="2">
             <strong>{$lang->ipt_newthread_options}</strong>
@@ -251,8 +251,8 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_postbit = [
-        'title'        => 'inplaytracker_postbit',
+    $ipt_postbit = [
+        'title'        => 'ipt_postbit',
         'template'    => $db->escape_string('<br /><br />
         <center>
             <div class="thead">{$thread[\'subject\']}</div>
@@ -267,8 +267,8 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_member_profile = [
-        'title'        => 'inplaytracker_member_profile',
+    $ipt_member_profile = [
+        'title'        => 'ipt_member_profile',
         'template'    => $db->escape_string('<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
         <tr>
             <td colspan="2" class="thead"><strong>{$lang->inplaytracker}</strong></td>
@@ -282,8 +282,8 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_member_profile_bit = [
-        'title'        => 'inplaytracker_member_profile_bit',
+    $ipt_member_profile_bit = [
+        'title'        => 'ipt_member_profile_bit',
         'template'    => $db->escape_string('<div class="ipbit">
         <table cellspacing="2px" cellpadding="0px" width="100%" style="font-size: 9px;">
             <tr>
@@ -314,8 +314,8 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_member_profile_bit_user = [
-        'title'        => 'inplaytracker_member_profile_bit_user',
+    $ipt_member_profile_bit_user = [
+        'title'        => 'ipt_member_profile_bit_user',
         'template'    => $db->escape_string('<div class="player">
         {$partnerlink}
     </div>'),
@@ -324,16 +324,16 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_header = [
-        'title'        => 'inplaytracker_header',
+    $ipt_header = [
+        'title'        => 'ipt_header',
         'template'    => $db->escape_string('<a href="misc.php?action=inplaytracker">{$lang->ipt_header_tracker} (<strong>{$openscenes}</strong>/{$countscenes})</a>'),
         'sid'        => '-1',
         'version'    => '',
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_misc = [
-        'title'        => 'inplaytracker_misc',
+    $ipt_misc = [
+        'title'        => 'ipt_misc',
         'template'    => $db->escape_string('<html>
         <head>
             <title>{$mybb->settings[\'bbname\']} - {$lang->ipt}</title>
@@ -357,8 +357,8 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_misc_bit = [
-        'title'        => 'inplaytracker_misc_bit',
+    $ipt_misc_bit = [
+        'title'        => 'ipt_misc_bit',
         'template'    => $db->escape_string('<div class="thead">{$user[\'username\']}</div>
         <div class="tcat">{$charscenes} {$lang->ipt_header_tracker}, {$charopenscenes} davon offen</div>
         {$scene_bit}'),
@@ -367,8 +367,8 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_misc_bit_scene = [
-        'title'        => 'inplaytracker_misc_bit_scene',
+    $ipt_misc_bit_scene = [
+        'title'        => 'ipt_misc_bit_scene',
         'template'    => $db->escape_string('<div class="threadlist">
         <table width="100%">
             <tr>
@@ -396,8 +396,8 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $inplaytracker_editscene = [
-        'title'        => 'inplaytracker_editscene',
+    $ipt_editscene = [
+        'title'        => 'ipt_editscene',
         'template'    => $db->escape_string('<html>
         <head>
         <title>{$mybb->settings[\'bbname\']} - {$lang->ipt}</title>
@@ -519,16 +519,16 @@ function inplaytracker_activate()
         'dateline'    => TIME_NOW
     ];
 
-    $db->insert_query("templates", $inplaytracker_newthread);
-    $db->insert_query("templates", $inplaytracker_postbit);
-    $db->insert_query("templates", $inplaytracker_member_profile);
-    $db->insert_query("templates", $inplaytracker_member_profile_bit);
-    $db->insert_query("templates", $inplaytracker_member_profile_bit_user);
-    $db->insert_query("templates", $inplaytracker_header);
-    $db->insert_query("templates", $inplaytracker_misc);
-    $db->insert_query("templates", $inplaytracker_misc_bit);
-    $db->insert_query("templates", $inplaytracker_misc_bit_scene);
-    $db->insert_query("templates", $inplaytracker_editscene);
+    $db->insert_query("templates", $ipt_newthread);
+    $db->insert_query("templates", $ipt_postbit);
+    $db->insert_query("templates", $ipt_member_profile);
+    $db->insert_query("templates", $ipt_member_profile_bit);
+    $db->insert_query("templates", $ipt_member_profile_bit_user);
+    $db->insert_query("templates", $ipt_header);
+    $db->insert_query("templates", $ipt_misc);
+    $db->insert_query("templates", $ipt_misc_bit);
+    $db->insert_query("templates", $ipt_misc_bit_scene);
+    $db->insert_query("templates", $ipt_editscene);
 	
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
     find_replace_templatesets("newthread", "#".preg_quote('{$loginbox}')."#i", '{$loginbox} {$newthread_inplaytracker}');
@@ -539,7 +539,7 @@ function inplaytracker_activate()
     
 }
 
-function inplaytracker_deactivate()
+function ipt_deactivate()
 {
     global $db, $cache;
     
@@ -550,8 +550,8 @@ function inplaytracker_deactivate()
 			$alertTypeManager = MybbStuff_MyAlerts_AlertTypeManager::createInstance($db, $cache);
 		}
 
-		$alertTypeManager->deleteByCode('inplaytracker_newthread');
-		$alertTypeManager->deleteByCode('inplaytracker_newreply');
+		$alertTypeManager->deleteByCode('ipt_newthread');
+		$alertTypeManager->deleteByCode('ipt_newreply');
 	}
 
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
@@ -561,7 +561,7 @@ function inplaytracker_deactivate()
 	$db->delete_query("templates", "title LIKE 'inplaytracker%'");
 }
 
-function inplaytracker_newthread()
+function ipt_newthread()
 {
     global $mybb, $lang, $templates, $post_errors, $forum, $newthread_inplaytracker;
     $lang->load('inplaytracker');
@@ -581,12 +581,12 @@ function inplaytracker_newthread()
                 $ipdescription = htmlspecialchars_uni($mybb->get_input('description'));
                 $ipdate = $mybb->get_input('ipdate');
             }
-           eval("\$newthread_inplaytracker = \"".$templates->get("inplaytracker_newthread")."\";");
+           eval("\$newthread_inplaytracker = \"".$templates->get("ipt_newthread")."\";");
         }
     }
 }
 
-function inplaytracker_do_newthread() {
+function ipt_do_newthread() {
     global $db, $mybb, $tid, $partners_new, $partner_uid;
     
     $ownuid = $mybb->user['uid'];
@@ -619,7 +619,7 @@ function inplaytracker_do_newthread() {
             $db->insert_query("ipt_scenes_partners", $new_record);
 
             if(class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
-                $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('inplaytracker_newthread');
+                $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('ipt_newthread');
                 if ($alertType != NULL && $alertType->getEnabled() && $ownuid != $partner_uid) {
                     $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$partner_uid, $alertType, (int)$tid);
                     MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
@@ -629,7 +629,7 @@ function inplaytracker_do_newthread() {
     }
 }
 
-function inplaytracker_editpost() {
+function ipt_editpost() {
 
     global $mybb, $db, $lang, $templates, $post_errors, $forum, $thread, $pid, $editpost_inplaytracker;
     $lang->load('inplaytracker');
@@ -666,13 +666,13 @@ function inplaytracker_editpost() {
                 $iport = htmlspecialchars_uni($scene['location']);
                 $ipdescription = htmlspecialchars_uni($scene['shortdesc']);
             }
-            eval("\$editpost_inplaytracker = \"".$templates->get("inplaytracker_newthread")."\";");
+            eval("\$editpost_inplaytracker = \"".$templates->get("ipt_newthread")."\";");
             }
         }
     }    
 }
 
-function inplaytracker_do_editpost()
+function ipt_do_editpost()
 {
     global $db, $mybb, $tid, $pid, $thread, $partners_new, $partner_uid;
 
@@ -708,7 +708,7 @@ function inplaytracker_do_editpost()
     }
 }
 
-function inplaytracker_forumdisplay(&$thread)
+function ipt_forumdisplay(&$thread)
 {
     global $db, $lang, $mybb, $thread, $foruminfo, $editscene;
 	$lang->load('inplaytracker');
@@ -747,7 +747,7 @@ function inplaytracker_forumdisplay(&$thread)
     } 
 }
 
-function inplaytracker_postbit(&$post) {
+function ipt_postbit(&$post) {
     global $db, $mybb, $lang, $templates, $pid, $tid;
     $lang->load("inplaytracker");
  
@@ -769,13 +769,13 @@ function inplaytracker_postbit(&$post) {
                 $partnerlink = build_profile_link($username, $partner['uid']);
                 $partnerlist .= "&nbsp; &nbsp;".$partnerlink;
             }
-            eval("\$post['inplaytracker'] = \"".$templates->get("inplaytracker_postbit")."\";");
+            eval("\$post['inplaytracker'] = \"".$templates->get("ipt_postbit")."\";");
             return $post;
         }
     }
 }
 
-function inplaytracker_profile() {
+function ipt_profile() {
     global $db, $mybb, $lang, $templates, $memprofile, $user_bit, $scenes_bit, $member_profile_inplaytracker;
     $lang->load('inplaytracker');
 
@@ -802,15 +802,15 @@ function inplaytracker_profile() {
                 $partner = get_user($users['uid']);
                 $username = format_name($partner['username'], $partner['usergroup'], $partner['displaygroup']);
                 $partnerlink = build_profile_link($username, $partner['uid']);
-                eval("\$user_bit .= \"".$templates->get("inplaytracker_member_profile_bit_user")."\";");
+                eval("\$user_bit .= \"".$templates->get("ipt_member_profile_bit_user")."\";");
             }
-            eval("\$scenes_bit .= \"".$templates->get("inplaytracker_member_profile_bit")."\";");
+            eval("\$scenes_bit .= \"".$templates->get("ipt_member_profile_bit")."\";");
         }
     }
-    eval("\$member_profile_inplaytracker = \"".$templates->get("inplaytracker_member_profile")."\";");
+    eval("\$member_profile_inplaytracker = \"".$templates->get("ipt_member_profile")."\";");
 }
 
-function inplaytracker_global() {
+function ipt_global() {
     global $db, $mybb, $lang, $templates, $header_inplaytracker;
     $lang->load('inplaytracker');
     $header_inplaytracker = "";
@@ -854,10 +854,10 @@ function inplaytracker_global() {
             }
         }
     }
-    eval("\$header_inplaytracker = \"".$templates->get("inplaytracker_header")."\";");
+    eval("\$header_inplaytracker = \"".$templates->get("ipt_header")."\";");
 }
 
-function inplaytracker_misc() {
+function ipt_misc() {
     global $db, $mybb, $lang, $templates, $headerinclude, $header, $footer;
     $lang->load('inplaytracker');   
     $page = "";
@@ -948,7 +948,7 @@ function inplaytracker_misc() {
                     $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers <br /> <b>{$lang->ipt_forumdisplay_date}:</b> $ipdate<br />
                     <b>{$ipdescription}</b>";
                     $lastpostdate = date("d.m.Y", $thread['lastpost']);
-                    eval("\$scene_bit .= \"".$templates->get("inplaytracker_misc_bit_scene")."\";");
+                    eval("\$scene_bit .= \"".$templates->get("ipt_misc_bit_scene")."\";");
                     $lastposter = $thread['lastposteruid'];
                     // get spid matching lastposteruid
                     $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
@@ -964,9 +964,9 @@ function inplaytracker_misc() {
                     $charscenes++;
                 }
             } 
-            eval("\$user_bit .= \"".$templates->get("inplaytracker_misc_bit")."\";");          
+            eval("\$user_bit .= \"".$templates->get("ipt_misc_bit")."\";");          
         }
-        eval("\$page = \"".$templates->get("inplaytracker_misc")."\";");
+        eval("\$page = \"".$templates->get("ipt_misc")."\";");
         output_page($page);
     }
 
@@ -998,7 +998,7 @@ function inplaytracker_misc() {
         }
 		$partners = implode(",", $partners);
 		
-		eval("\$page = \"".$templates->get("inplaytracker_editscene")."\";");
+		eval("\$page = \"".$templates->get("ipt_editscene")."\";");
 		output_page($page);
 	}
 	
@@ -1034,7 +1034,7 @@ function inplaytracker_misc() {
 	}
 }
 
-function inplaytracker_do_newreply()
+function ipt_do_newreply()
 {
 	global $db, $mybb, $lang, $thread, $forum;
 	$lang->load('inplaytracker');
@@ -1048,7 +1048,7 @@ function inplaytracker_do_newreply()
             $last_post = $db->fetch_field($db->query("SELECT pid FROM ".TABLE_PREFIX."posts WHERE tid = '$thread[tid]' ORDER BY pid DESC LIMIT 1"), "pid");  
             if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
                 while($partners = $db->fetch_array($query)) {
-                    $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('inplaytracker_newreply');
+                    $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('ipt_newreply');
                     if ($alertType != NULL && $alertType->getEnabled() && $mybb->user['uid'] != $partners['uid']) {
                         $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$partners['uid'], $alertType, (int)$thread['tid']);
                         $alert->setExtraDetails([
@@ -1063,7 +1063,7 @@ function inplaytracker_do_newreply()
     }
 }
 
-function inplaytracker_alerts() {
+function ipt_alerts() {
 	global $mybb, $lang;
 	$lang->load('inplaytracker');
 	/**
@@ -1081,7 +1081,7 @@ function inplaytracker_alerts() {
 	    public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
 	    {
 	        return $this->lang->sprintf(
-	            $this->lang->inplaytracker_newthread,
+	            $this->lang->ipt_newthread,
 	            $outputAlert['from_user'],
 	            $outputAlert['dateline']
 	        );
@@ -1121,7 +1121,7 @@ function inplaytracker_alerts() {
 		}
 
 		$formatterManager->registerFormatter(
-				new MybbStuff_MyAlerts_Formatter_InplaytrackerNewthreadFormatter($mybb, $lang, 'inplaytracker_newthread')
+				new MybbStuff_MyAlerts_Formatter_InplaytrackerNewthreadFormatter($mybb, $lang, 'ipt_newthread')
 		);
 	}
 
@@ -1141,7 +1141,7 @@ function inplaytracker_alerts() {
 			{
 					$alertContent = $alert->getExtraDetails();
 					return $this->lang->sprintf(
-							$this->lang->inplaytracker_newreply,
+							$this->lang->ipt_newreply,
 							$outputAlert['from_user'],
 							$alertContent['subject'],
 							$outputAlert['dateline']
@@ -1183,7 +1183,7 @@ function inplaytracker_alerts() {
 		}
 
 		$formatterManager->registerFormatter(
-				new MybbStuff_MyAlerts_Formatter_InplaytrackerNewreplyFormatter($mybb, $lang, 'inplaytracker_newreply')
+				new MybbStuff_MyAlerts_Formatter_InplaytrackerNewreplyFormatter($mybb, $lang, 'ipt_newreply')
 		);
 	}
 
