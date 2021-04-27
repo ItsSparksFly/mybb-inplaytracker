@@ -412,7 +412,7 @@ function ipt_activate()
 		'version'	=> '',
 		'dateline'	=> TIME_NOW
     ];
-	$db->insert_query("templates", $insert_array);
+	$db->insert_query("templates", $ipt_showthread);
 
     $ipt_editscene = [
         'title'        => 'ipt_editscene',
