@@ -17,6 +17,7 @@ $l['ipt_forumdisplay_date'] = "Datum";
 $l['ipt_postbit_by'] = "mit";
 $l['ipt_header_tracker'] = "Szenen";
 $l['ipt_header_tracker_open'] = "davon offen";
+$l['ipt_editscene'] = "Szenen-Informationen bearbeiten";
 
 // Alerts
 $l['ipt_newthread'] = "{1} hat dir eine neue Szene erstellt!";

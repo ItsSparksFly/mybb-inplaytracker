@@ -13,6 +13,7 @@ $plugins->add_hook("editpost_do_editpost_end", "ipt_do_editpost");
 $plugins->add_hook("forumdisplay_thread_end", "ipt_forumdisplay");
 $plugins->add_hook("postbit", "ipt_postbit");
 $plugins->add_hook("member_profile_end", "ipt_profile");
+$plugins->add_hook("showthread_start", "ipt_showthread");
 $plugins->add_hook("global_intermediate", "ipt_global");
 $plugins->add_hook("misc_start", "ipt_misc");
 $plugins->add_hook("newreply_do_newreply_end", "ipt_do_newreply");
@@ -404,6 +405,15 @@ function ipt_activate()
         'dateline'    => TIME_NOW
     ];
 
+	$ipt_showthread = [
+		'title'		=> 'ipt_showthread',
+		'template'	=> $db->escape_string('<li class="sendthread"><a href="misc.php?action=edit_scene&tid={$thread[\'tid\']}">{$lang->ipt_editscene}</a></li>'),
+		'sid'		=> '-1',
+		'version'	=> '',
+		'dateline'	=> TIME_NOW
+    ];
+	$db->insert_query("templates", $insert_array);
+
     $ipt_editscene = [
         'title'        => 'ipt_editscene',
         'template'    => $db->escape_string('<html>
@@ -544,7 +554,8 @@ function ipt_activate()
     find_replace_templatesets("postbit", "#".preg_quote('{$post[\'message\']}')."#i", '{$post[\'inplaytracker\']} {$post[\'message\']}');
     find_replace_templatesets("postbit_classic", "#".preg_quote('{$post[\'message\']}')."#i", '{$post[\'inplaytracker\']} {$post[\'message\']}');
     find_replace_templatesets("member_profile", "#".preg_quote('{$awaybit}')."#i", '{$awaybit} {$member_profile_inplaytracker}');
-    
+    find_replace_templatesets("showthread", "#".preg_quote('{$printthread}')."#i", '{$showthread_inplaytracker}{$printthread}');
+
 }
 
 function ipt_deactivate()
@@ -565,8 +576,12 @@ function ipt_deactivate()
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
     find_replace_templatesets("newthread", "#".preg_quote('{$newthread_inplaytracker}')."#i", '', 0);
     find_replace_templatesets("editpost", "#".preg_quote('{$editpost_inplaytracker}')."#i", '', 0);
+    find_replace_templatesets("postbit", "#".preg_quote('{$post[\'inplaytracker\']}')."#i", '', 0);
+    find_replace_templatesets("postbit_classic", "#".preg_quote('{$post[\'inplaytracker\']}')."#i", '', 0);
+    find_replace_templatesets("member_profile", "#".preg_quote('{$member_profile_inplaytracker}')."#i", '', 0);
+    find_replace_templatesets("showthread", "#".preg_quote('{$showthread_inplaytracker}')."#i", '', 0);
 
-	$db->delete_query("templates", "title LIKE 'inplaytracker%'");
+	$db->delete_query("templates", "title LIKE 'ipt%'");
 }
 
 function ipt_newthread()
@@ -1083,6 +1098,20 @@ function ipt_do_newreply()
             }
         }
     }
+}
+
+function ipt_showthread() {
+	global $lang, $templates, $mybb, $forum, $thread, $showthread_inplaytracker;
+	$lang->load('ipt');	
+	
+	// insert button
+	$forum['parentlist'] = ",".$forum['parentlist'].",";
+	$selectedforums = explode(",", $mybb->settings['ipt_inplay']);
+	foreach($selectedforums as $selected) {
+		if(preg_match("/,{$selected},/i", $forum['parentlist']) || $mybb->settings['ipt_inplay'] == "-1") {
+			eval("\$showthread_inplaytracker = \"".$templates->get("ipt_showthread")."\";");
+		}
+	}
 }
 
 function ipt_alerts() {
