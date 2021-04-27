@@ -92,8 +92,8 @@ Folgende Templates werden durch dieses Plugin <i>bearbeitet</i>:
 <a href="http://doylecc.altervista.org/bb/downloads.php?dlid=4&cat=1" target="_blank">Enhanced Account Switcher</a> von doylecc<br />
 
 # Empfohlene Pugins
-<a href="https://github.com/MyBBStuff/MyAlerts" target="_blank">MyAlerts</a> von euanT
-<a href="https://github.com/aheartforspinach/Posting-Erinnerung" target="_blank">Posting Erinnerung</a> von aheartforspinach
+<a href="https://github.com/MyBBStuff/MyAlerts" target="_blank">MyAlerts</a> von euanT<br />
+<a href="https://github.com/aheartforspinach/Posting-Erinnerung" target="_blank">Posting Erinnerung</a> von aheartforspinach<br />
 <a href="https://github.com/aheartforspinach/Archivierung">Archivierung</a> von a heartforspinach
 
 # Upgrade
