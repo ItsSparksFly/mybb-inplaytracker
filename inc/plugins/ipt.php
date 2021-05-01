@@ -75,12 +75,14 @@ function ipt_install()
 			'title' => $lang->ipt_inplay,
 			'description' => $lang->ipt_inplay_description,
 			'optionscode' => 'forumselect',
+            'value' => '0',
 			'disporder' => 1
         ],
         'ipt_archive' => [
 			'title' => $lang->ipt_archive,
 			'description' => $lang->ipt_archive_description,
 			'optionscode' => 'forumselect',
+            'value' => '0',
 			'disporder' => 2
 		]
     ];
