@@ -866,15 +866,22 @@ function ipt_global() {
         // get all scenes for this uid...
 		$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid FROM ".TABLE_PREFIX."ipt_scenes_partners
 		LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
-		LEFT JOIN ".TABLE_PREFIX."forums ON ".TABLE_PREFIX."forums.fid = ".TABLE_PREFIX."threads.fid
-		WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['ipt_inplay']})
-		AND ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
+		WHERE ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
 		AND ".TABLE_PREFIX."threads.visible = '1'
 		");
         while($scenelist = $db->fetch_array($query_2)) {
             // get thread infos
             $thread = get_thread($scenelist['tid']);
-            if($thread && $thread['visible'] == "1") {
+            $forum = get_forum($thread['fid']);
+            $forum['parentlist'] = ",".$forum['parentlist'].",";   
+            $all_forums = $mybb->settings['ipt_inplay'];
+            $selectedforums = explode(",", $all_forums);
+            foreach($selectedforums as $selected) {
+                if(preg_match("/,$selected,/i", $forum['parentlist'])) {  
+                    $isactive = true;
+                }
+            }
+            if($thread && $thread['visible'] == "1" && $isactive) {
                 $lastposter = $thread['lastposteruid'];
                 // get spid matching lastposteruid
                 $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
@@ -957,10 +964,8 @@ function ipt_misc() {
             $user = get_user($userlist['uid']);
 			$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid FROM ".TABLE_PREFIX."ipt_scenes_partners
 			LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
-			LEFT JOIN ".TABLE_PREFIX."forums ON ".TABLE_PREFIX."forums.fid = ".TABLE_PREFIX."threads.fid
             LEFT JOIN ".TABLE_PREFIX."ipt_scenes ON ".TABLE_PREFIX."ipt_scenes.tid = ".TABLE_PREFIX."ipt_scenes_partners.tid
-			WHERE ".TABLE_PREFIX."forums.parentlist IN({$mybb->settings['ipt_inplay']})
-			AND ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
+			WHERE ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
 			AND ".TABLE_PREFIX."threads.visible = '1'
 			ORDER BY date ASC
 			");
@@ -971,7 +976,16 @@ function ipt_misc() {
                 $query_3 = $db->simple_select("ipt_scenes", "*", "tid = '{$scenelist['tid']}'");
                 $scene = $db->fetch_array($query_3);
                 $thread = get_thread($scene['tid']);
-                if($thread && $thread['visible'] == "1") {
+                $forum = get_forum($thread['fid']);
+                $forum['parentlist'] = ",".$forum['parentlist'].",";   
+                $all_forums = $mybb->settings['ipt_inplay'];
+                $selectedforums = explode(",", $all_forums);
+                foreach($selectedforums as $selected) {
+                    if(preg_match("/,$selected,/i", $forum['parentlist'])) {  
+                        $isactive = true;
+                    }
+                }
+                if($thread && $thread['visible'] == "1" && $isactive) {
                     $query_4 = $db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'");
                     $partnerusers = [];
                     while($partners = $db->fetch_array($query_4)) {
