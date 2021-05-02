@@ -812,6 +812,7 @@ function ipt_profile() {
                         WHERE uid = '{$memprofile['uid']}'
                         ORDER BY date ASC");
     while($scenelist = $db->fetch_array($query)) {
+        $isactive = false;
         $thread = get_thread($scenelist['tid']);
         $forum = get_forum($thread['fid']);
         if($thread) {
