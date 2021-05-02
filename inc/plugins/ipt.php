@@ -871,6 +871,7 @@ function ipt_global() {
 		");
         while($scenelist = $db->fetch_array($query_2)) {
             // get thread infos
+            $isactive = false;
             $thread = get_thread($scenelist['tid']);
             $forum = get_forum($thread['fid']);
             $forum['parentlist'] = ",".$forum['parentlist'].",";   
