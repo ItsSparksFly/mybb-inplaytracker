@@ -812,7 +812,6 @@ function ipt_profile() {
                         WHERE uid = '{$memprofile['uid']}'
                         ORDER BY date ASC");
     while($scenelist = $db->fetch_array($query)) {
-        $isactive = false;
         $thread = get_thread($scenelist['tid']);
         $forum = get_forum($thread['fid']);
         if($thread) {
@@ -978,6 +977,7 @@ function ipt_misc() {
                 $query_3 = $db->simple_select("ipt_scenes", "*", "tid = '{$scenelist['tid']}'");
                 $scene = $db->fetch_array($query_3);
                 $thread = get_thread($scene['tid']);
+                $isactive = false;
                 $forum = get_forum($thread['fid']);
                 $forum['parentlist'] = ",".$forum['parentlist'].",";   
                 $all_forums = $mybb->settings['ipt_inplay'];
