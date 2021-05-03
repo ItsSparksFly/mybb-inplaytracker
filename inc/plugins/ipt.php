@@ -274,7 +274,7 @@ function ipt_activate()
         'title'        => 'ipt_member_profile',
         'template'    => $db->escape_string('<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
         <tr>
-            <td colspan="2" class="thead"><strong>{$lang->ipt}</strong></td>
+            <td colspan="2" class="thead"><strong>{$lang->ipt}</strong> ({$active_scenes})</td>
         </tr>
         <tr>
             <td class="trow1">{$scenes_bit}</td>
@@ -282,7 +282,7 @@ function ipt_activate()
         </table>
         <table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
         <tr>
-            <td colspan="2" class="thead"><strong>{$lang->ipt_archive}</strong></td>
+            <td colspan="2" class="thead"><strong>{$lang->ipt_archive}</strong>({$archive_scenes})</td>
         </tr>
         <tr>
             <td class="trow1">{$scenes_archive_bit}</td>
@@ -838,8 +838,10 @@ function ipt_profile() {
                 }
             }
             if($isarchive) {
+                $archive_scenes++;
                 eval("\$scenes_archive_bit .= \"".$templates->get("ipt_member_profile_bit")."\";");
             } else {
+                $active_scenes++;
                 eval("\$scenes_bit .= \"".$templates->get("ipt_member_profile_bit")."\";");
             }
         }
