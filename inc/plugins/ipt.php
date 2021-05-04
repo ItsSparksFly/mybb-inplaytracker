@@ -912,7 +912,7 @@ function ipt_misc() {
 
     $mybb->input['action'] = $mybb->get_input('action');
     if($mybb->input['action'] == "do_upgrade") {
-        $query = $db->simple_select("threads", "*", "partners != '' OR partners != '0'");
+        $query = $db->simple_select("threads", "*", "partners != '' AND partners != '0' AND ipdate != ''");
         while($thread = $db->fetch_array($query)) {
             $partners = explode(",", $thread['partners']);
             foreach($partners as $partner) {
