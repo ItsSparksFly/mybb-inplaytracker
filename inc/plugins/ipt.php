@@ -147,6 +147,20 @@ function ipt_activate()
 		$alertType->setCanBeUserDisabled(true);
 
 		$alertTypeManager->add($alertType);
+
+        $alertType = new MybbStuff_MyAlerts_Entity_AlertType();
+		$alertType->setCode('inplaytracker_newthread_follow'); // The codename for your alert type. Can be any unique string.
+		$alertType->setEnabled(true);
+		$alertType->setCanBeUserDisabled(true);
+
+        $alertTypeManager->add($alertType);
+        
+        $alertType = new MybbStuff_MyAlerts_Entity_AlertType();
+		$alertType->setCode('inplaytracker_newreply_follow'); // The codename for your alert type. Can be any unique string.
+		$alertType->setEnabled(true);
+		$alertType->setCanBeUserDisabled(true);
+
+		$alertTypeManager->add($alertType);
 	}
     
     // create templates
@@ -632,6 +646,23 @@ function ipt_do_newthread() {
             "uid" => (int)$ownuid
         ];
         $db->insert_query("ipt_scenes_partners", $new_record);
+        
+        if($db->table_exists("follow")) {
+            $query = $db->simple_select("follow", "fromid", "toid='$ownuid'");
+            while($follower = $db->fetch_array($query)) {
+                if(class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+                    $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('inplaytracker_newthread_follow');
+                    if ($alertType != NULL && $alertType->getEnabled() && $ownuid != $partner_uid) {
+                        $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$follower['fromid'], $alertType, (int)$tid);
+                        $alert->setExtraDetails([
+                            'username' => $user['username']
+                        ]);
+                        MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+                    }
+                }
+            }
+        }
+
         $partners_new = explode(",", $mybb->get_input('partners'));
 		$partners_new = array_map("trim", $partners_new);
 		foreach($partners_new as $partner) {
@@ -648,6 +679,21 @@ function ipt_do_newthread() {
                 if ($alertType != NULL && $alertType->getEnabled() && $ownuid != $partner_uid) {
                     $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$partner_uid, $alertType, (int)$tid);
                     MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+                }
+            }
+            if($db->table_exists("follow")) {
+                $query = $db->simple_select("follow", "fromid", "toid='$partner_uid'");
+                while($follower = $db->fetch_array($query)) {
+                    if(class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+                        $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('inplaytracker_newthread_follow');
+                        if ($alertType != NULL && $alertType->getEnabled() && $ownuid != $partner_uid) {
+                            $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$follower['fromid'], $alertType, (int)$tid);
+                            $alert->setExtraDetails([
+                                'username' => $partner
+                            ]);
+                            MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+                        }
+                    }
                 }
             }
 		}
@@ -1101,7 +1147,20 @@ function ipt_do_newreply()
         if(preg_match("/,$selected,/i", $forum['parentlist'])) {   
             $query = $db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'");
             $last_post = $db->fetch_field($db->query("SELECT pid FROM ".TABLE_PREFIX."posts WHERE tid = '$thread[tid]' ORDER BY pid DESC LIMIT 1"), "pid");  
-            if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+            if (class_exists('MybbStuff_MyAlerts_AlertTypeManager') && $db->table_exists("follow")) {
+                $query = $db->simple_select("follow", "fromid", "toid='$fromid'");
+                while($follower = $db->fetch_array($query)) {
+                    $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('inplaytracker_newreply_follow');
+                    if ($alertType != NULL && $alertType->getEnabled()) {
+                        $alert = new MybbStuff_MyAlerts_Entity_Alert((int)$follower['fromid'], $alertType, (int)$thread['tid']);
+                        $alert->setExtraDetails([
+                            'subject' => $thread['subject'],
+                            'lastpost' => $last_post
+                        ]);
+                        MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+                    }
+                }
+
                 while($partners = $db->fetch_array($query)) {
                     $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('ipt_newreply');
                     if ($alertType != NULL && $alertType->getEnabled() && $mybb->user['uid'] != $partners['uid']) {
