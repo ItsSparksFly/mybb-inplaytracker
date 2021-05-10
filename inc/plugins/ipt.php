@@ -978,18 +978,6 @@ function ipt_misc() {
             $db->insert_query("ipt_scenes", $insert_array);
         }
 
-        // delete old tables
-        $columns = [ "partners", "ipdate", "iport", "ipdaytime", "openscene", "postorder" ];
-        $tables = [ "threads", "posts" ];
-        foreach($columns as $column) {
-            foreach($tables as $table) {
-                if($db->field_exists($column, $table))
-                {
-                $db->drop_column($table, $column);
-                }
-            }         
-        }
-
         // delete old settings
         $db->delete_query('settings', "name LIKE '%inplaytracker%'");
         $db->delete_query('settinggroups', "name = 'inplaytracker'");
