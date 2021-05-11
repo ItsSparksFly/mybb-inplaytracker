@@ -750,11 +750,12 @@ function ipt_do_editpost()
     if($pid != $thread['firstpost']) {
 		return;
 	}
+	
+    $sid = $db->fetch_field($db->simple_query("ipt_scenes", "tid", "tid = '$tid'"), "tid");
 
     // write partners into database
     if(!empty($mybb->get_input('partners'))) {
         $db->delete_query("ipt_scenes_partners", "tid='{$tid}'");
-
         $partners_new = explode(",", $mybb->get_input('partners'));
         $partners_new = array_map("trim", $partners_new);
         foreach($partners_new as $partner) {
@@ -772,10 +773,16 @@ function ipt_do_editpost()
         $new_record = [
             "date" => $ipdate,
             "location" => $db->escape_string($mybb->get_input('iport')),
-            "shortdesc" => $db->escape_string($mybb->get_input('description'))
+            "shortdesc" => $db->escape_string($mybb->get_input('description')),
+	    "tid" => $tid
         ];
 
-        $db->update_query("ipt_scenes", $new_record, "tid='{$tid}'");
+	if(!$sid) {
+	    $db->insert_query("ipt_scenes", $new_record);
+    	}  
+	else {
+        	$db->update_query("ipt_scenes", $new_record, "tid='{$tid}'");
+	}
     }
 }
 
