@@ -751,7 +751,7 @@ function ipt_do_editpost()
 		return;
 	}
 	
-    $sid = $db->fetch_field($db->simple_query("ipt_scenes", "tid", "tid = '$tid'"), "tid");
+    $sid = $db->fetch_field($db->simple_select("ipt_scenes", "tid", "tid = '$tid'"), "tid");
 
     // write partners into database
     if(!empty($mybb->get_input('partners'))) {
