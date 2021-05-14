@@ -1017,6 +1017,7 @@ function ipt_misc() {
             (int)$charscenes = 0;
             (int)$charopenscenes = 0;
             while($scenelist = $db->fetch_array($query_2)) {
+		$isnext = "";
                 $query_3 = $db->simple_select("ipt_scenes", "*", "tid = '{$scenelist['tid']}'");
                 $scene = $db->fetch_array($query_3);
                 $thread = get_thread($scene['tid']);
@@ -1044,7 +1045,6 @@ function ipt_misc() {
                     $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers <br /> <b>{$lang->ipt_forumdisplay_date}:</b> $ipdate<br />
                     <b>{$ipdescription}</b>";
                     $lastpostdate = date("d.m.Y", $thread['lastpost']);
-                    eval("\$scene_bit .= \"".$templates->get("ipt_misc_bit_scene")."\";");
                     $lastposter = $thread['lastposteruid'];
                     // get spid matching lastposteruid
                     $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
@@ -1055,9 +1055,11 @@ function ipt_misc() {
                         $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'", [ "order_by" => 'spid', "order_dir" => 'ASC', 'limit' => 1 ]), "uid");
                     }
                     if($next_uid == $userlist['uid']) {
+			$isnext = "Du bist dran!";
                         $charopenscenes++;
                     }
                     $charscenes++;
+                    eval("\$scene_bit .= \"".$templates->get("ipt_misc_bit_scene")."\";");
                 }
             } 
             eval("\$user_bit .= \"".$templates->get("ipt_misc_bit")."\";");          
