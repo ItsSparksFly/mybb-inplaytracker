@@ -397,7 +397,7 @@ function ipt_activate()
         'template'    => $db->escape_string('<div class="threadlist">
         <table width="100%">
             <tr>
-                <td width="60%" valign="middle">
+                <td width="60%" valign="middle"><strong>{$isnext}</strong><br />
                     <a href="showthread.php?tid={$thread[\'tid\']}" class="threadlink">{$thread[\'subject\']}</a>
                 </td>
                 <td width="40%" valign="middle" align="right">
