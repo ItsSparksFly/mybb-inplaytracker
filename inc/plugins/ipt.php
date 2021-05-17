@@ -1001,7 +1001,7 @@ function ipt_misc() {
             $as_uid = $mybb->user['uid'];
         }
     
-        $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$as_uid}'");
+        $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$as_uid}'", [ "order_by" => "username", "order_dir" => "ASC" ]); 
         $user_bit = "";
         while($userlist = $db->fetch_array($query)) {  
             // get all scenes for this uid...
