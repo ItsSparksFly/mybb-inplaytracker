@@ -1221,7 +1221,7 @@ function ipt_alerts() {
 	    public function init()
 	    {
 	        if (!$this->lang->inplaytracker) {
-	            $this->lang->load('inplaytracker');
+	            $this->lang->load('ipt');
 	        }
 	    }
 
@@ -1282,7 +1282,7 @@ function ipt_alerts() {
 			public function init()
 			{
 					if (!$this->lang->inplaytracker) {
-							$this->lang->load('inplaytracker');
+							$this->lang->load('ipt');
 					}
 			}
 
