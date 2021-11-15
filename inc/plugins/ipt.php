@@ -1044,7 +1044,7 @@ function ipt_misc() {
                     $ipdescription = $scene['shortdesc'];
                     $thread['profilelink'] =  "<b>{$lang->ipt_forumdisplay_characters}:</b> $partnerusers <br /> <b>{$lang->ipt_forumdisplay_date}:</b> $ipdate<br />
                     <b>{$ipdescription}</b>";
-                    $lastpostdate = date("d.m.Y", $thread['lastpost']);
+                    $lastpostdate = my_date("relative", $thread['lastpost']);
                     $lastposter = $thread['lastposteruid'];
                     // get spid matching lastposteruid
                     $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
