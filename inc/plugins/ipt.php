@@ -782,7 +782,7 @@ function ipt_do_editpost()
     $sid = $db->fetch_field($db->simple_select("ipt_scenes", "tid", "tid = '$tid'"), "tid");
 
     // write partners into database
-    if(!empty($mybb->get_input('partners'))) {
+    if(!empty($mybb->get_input('ipdate'))) {
         $db->delete_query("ipt_scenes_partners", "tid='{$tid}'");
         $partners_new = explode(",", $mybb->get_input('partners'));
         $partners_new = array_map("trim", $partners_new);
