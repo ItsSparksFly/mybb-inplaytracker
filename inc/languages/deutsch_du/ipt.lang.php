@@ -3,7 +3,9 @@ $l['ipt'] = "Inplaytracker";
 $l['ipt_archive'] = "Archivierte Szenen";
 $l['ipt_newthread_options'] = "Inplaytracker-Optionen";
 $l['ipt_newthread_partners'] = "Mitspieler";
+$l['ipt_newthread_openscene'] = "Offene Szene?";
 $l['ipt_newthread_partners_description'] = "Gib deine Mitspieler in der Reihenfolge an, in der gepostet werden soll.";
+$l['ipt_newthread_openscene_description'] = "An einer offenen Szene können potenziell alle Charaktere des Forums teilnehmen. Außerdem gibt es für offene Szenen keine Postingreihenfolge - die kannst du wieder einführen, wenn du nachdem alle Postpartner sich eingetragen haben, den Haken wieder entfernst.";
 $l['ipt_newthread_date'] = "Datum";
 $l['ipt_newthread_location'] = "Ort";
 $l['ipt_newthread_private'] = "Öffentliche Szene";
@@ -18,6 +20,7 @@ $l['ipt_postbit_by'] = "mit";
 $l['ipt_header_tracker'] = "Szenen";
 $l['ipt_header_tracker_open'] = "davon offen";
 $l['ipt_editscene'] = "Szenen-Informationen bearbeiten";
+$l['ipt_addtoscene'] = "An Szene teilnehmen";
 
 // Alerts
 $l['ipt_newthread'] = "{1} hat dir eine neue Szene erstellt!";

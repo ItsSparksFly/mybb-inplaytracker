@@ -48,6 +48,7 @@ function ipt_install()
         `location` varchar(140) NOT NULL,
         `date` varchar(140) NOT NULL,
         `shortdesc` varchar(2500) NOT NULL,
+        `openscene` TINYINT(1) NOT NULL DEFAULT '0',
         PRIMARY KEY (`sid`),
         KEY `lid` (`sid`)
      ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1");
@@ -180,6 +181,16 @@ function ipt_activate()
                     <input type="text" class="textbox" name="partners" id="partners" size="40" maxlength="1155" value="{$partners}" style="min-width: 347px; max-width: 100%;" /> <br />
                     {$lang->ipt_newthread_partners_description}
                 </span> 
+            </td>
+        </tr>
+        <tr>
+            <td class="trow1" width="20%">
+                <strong>{$lang->ipt_newthread_openscene}</strong> <input type="checkbox" name="openscene" {$checked} \>	
+            </td>
+            <td class="trow1">	
+            <span class="smalltext">
+            {$lang->ipt_newthread_openscene_description}
+            </span>
             </td>
         </tr>
         <tr>
@@ -423,7 +434,7 @@ function ipt_activate()
 
 	$ipt_showthread = [
 		'title'		=> 'ipt_showthread',
-		'template'	=> $db->escape_string('<li class="sendthread"><a href="misc.php?action=edit_scene&tid={$thread[\'tid\']}">{$lang->ipt_editscene}</a></li>'),
+		'template'	=> $db->escape_string('{$addopen}<li class="sendthread"><a href="misc.php?action=edit_scene&tid={$thread[\'tid\']}">{$lang->ipt_editscene}</a></li>'),
 		'sid'		=> '-1',
 		'version'	=> '',
 		'dateline'	=> TIME_NOW
@@ -619,6 +630,9 @@ function ipt_newthread()
                 $iport = htmlspecialchars_uni($mybb->get_input('iport'));
                 $ipdescription = htmlspecialchars_uni($mybb->get_input('description'));
                 $ipdate = $mybb->get_input('ipdate');
+                if(!empty($mybb->get_input('openscene'))) {
+                    $checked = "checked";
+                }
             }
            eval("\$newthread_inplaytracker = \"".$templates->get("ipt_newthread")."\";");
         }
@@ -629,14 +643,20 @@ function ipt_do_newthread() {
     global $db, $mybb, $tid, $partners_new, $partner_uid;
     
     $ownuid = $mybb->user['uid'];
-    if(!empty($mybb->get_input('partners'))) {
+    if(!empty($mybb->get_input('ipdate'))) {
         // insert thread infos into database   
         $ipdate = strtotime($mybb->get_input('ipdate'));
+        if(!empty($mybb->get_input('openscene'))) {
+            $openscene = 1;
+        } else {
+            $openscene = 0;
+        }
         $new_record = [
             "date" => $ipdate,
             "location" => $db->escape_string($mybb->get_input('iport')),
             "shortdesc" => $db->escape_string($mybb->get_input('description')),
-            "tid" => (int)$tid
+            "tid" => (int)$tid,
+            "openscene" => (int)$openscene
         ];
         $db->insert_query("ipt_scenes", $new_record);
         
@@ -672,7 +692,9 @@ function ipt_do_newthread() {
                 "tid" => (int)$tid,
                 "uid" => (int)$partner_uid
             ];
-            $db->insert_query("ipt_scenes_partners", $new_record);
+            if($partner_uid != 0) {
+                $db->insert_query("ipt_scenes_partners", $new_record);
+            }
 
             if(class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
                 $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('ipt_newthread');
@@ -723,6 +745,9 @@ function ipt_editpost() {
                 $iport = htmlspecialchars_uni($mybb->get_input('iport'));
                 $ipdescription = htmlspecialchars_uni($mybb->get_input('description'));
                 $ipdate = $mybb->get_input('ipdate');
+                if(!empty($mybb->get_input('openscene'))) {
+                    $checked = "checked";
+                }
             }
             else
             {
@@ -736,6 +761,9 @@ function ipt_editpost() {
                 $ipdate = date("Y-m-d", $scene['date']);
                 $iport = htmlspecialchars_uni($scene['location']);
                 $ipdescription = htmlspecialchars_uni($scene['shortdesc']);
+                if($scene['openscene'] == "1") {
+                    $checked = "checked";
+                }
             }
             eval("\$editpost_inplaytracker = \"".$templates->get("ipt_newthread")."\";");
             }
@@ -769,12 +797,19 @@ function ipt_do_editpost()
         }
 
         $ipdate = strtotime($mybb->input['ipdate']);
+
+        if(!empty($mybb->get_input('openscene'))) {
+            $openscene = 1;
+        } else {
+            $openscene = 0;
+        }
         
         $new_record = [
             "date" => $ipdate,
             "location" => $db->escape_string($mybb->get_input('iport')),
             "shortdesc" => $db->escape_string($mybb->get_input('description')),
-	    "tid" => $tid
+            "openscene" => (int)$openscene,
+	        "tid" => $tid
         ];
 
 	if(!$sid) {
@@ -921,6 +956,7 @@ function ipt_global() {
         // get all scenes for this uid...
 		$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid FROM ".TABLE_PREFIX."ipt_scenes_partners
 		LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
+        LEFT JOIN ".TABLE_PREFIX."ipt_scenes ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."ipt_scenes.tid
 		WHERE ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
 		AND ".TABLE_PREFIX."threads.visible = '1'
 		");
@@ -938,17 +974,19 @@ function ipt_global() {
                 }
             }
             if($thread && $thread['visible'] == "1" && $isactive) {
-                $lastposter = $thread['lastposteruid'];
-                // get spid matching lastposteruid
-                $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
-                // now that we've got the spid, we can hopefully see who is next in line
-                $next = $lastposter_spid + 1;
-                $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid = '{$next}'"), "uid");
-                if(empty($next_uid)) {
-                    $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'", [ "order_by" => 'spid', "order_dir" => 'ASC', 'limit' => 1 ]), "uid");
-                }
-                if($next_uid == $userlist['uid']) {
-                    $openscenes++;
+                    if($scenelist['openscene'] == "0") {
+                    $lastposter = $thread['lastposteruid'];
+                    // get spid matching lastposteruid
+                    $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
+                    // now that we've got the spid, we can hopefully see who is next in line
+                    $next = $lastposter_spid + 1;
+                    $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid = '{$next}'"), "uid");
+                    if(empty($next_uid)) {
+                        $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'", [ "order_by" => 'spid', "order_dir" => 'ASC', 'limit' => 1 ]), "uid");
+                    }
+                    if($next_uid == $userlist['uid']) {
+                        $openscenes++;
+                    }
                 }
                 $countscenes++;
             }
@@ -964,6 +1002,23 @@ function ipt_misc() {
     
 
     $mybb->input['action'] = $mybb->get_input('action');
+
+    if($mybb->input['action'] == "addtoscene") {
+        $tid = (int)$mybb->get_input('tid');
+        $query = $db->simple_select("ipt_scenes", "*", "tid = '{$tid}'");
+        $scene = $db->fetch_array($query);
+        if($scene['openscene'] == "0") {
+            error_no_permission();
+        } else {
+            $insert_array = [
+                "tid" => (int)$tid,
+                "uid" => (int)$mybb->user['uid']
+            ];
+            $db->insert_query("ipt_scenes_partners", $insert_array);    
+            redirect("showthread.php?tid={$tid}"); 
+        }
+    }
+
     if($mybb->input['action'] == "do_upgrade") {
         $query = $db->simple_select("threads", "*", "partners != '' AND partners != '0' AND ipdate != ''");
         while($thread = $db->fetch_array($query)) {
@@ -1046,17 +1101,21 @@ function ipt_misc() {
                     <b>{$ipdescription}</b>";
                     $lastpostdate = my_date("relative", $thread['lastpost']);
                     $lastposter = $thread['lastposteruid'];
-                    // get spid matching lastposteruid
-                    $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
-                    // now that we've got the spid, we can hopefully see who is next in line
-                    $next = $lastposter_spid + 1;
-                    $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid = '{$next}'"), "uid");
-                    if(empty($next_uid)) {
-                        $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'", [ "order_by" => 'spid', "order_dir" => 'ASC', 'limit' => 1 ]), "uid");
-                    }
-                    if($next_uid == $userlist['uid']) {
-			$isnext = "Du bist dran!";
-                        $charopenscenes++;
+                    if($scene['openscene'] != 1) {
+                        // get spid matching lastposteruid
+                        $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
+                        // now that we've got the spid, we can hopefully see who is next in line
+                        $next = $lastposter_spid + 1;
+                        $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid = '{$next}'"), "uid");
+                        if(empty($next_uid)) {
+                            $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'", [ "order_by" => 'spid', "order_dir" => 'ASC', 'limit' => 1 ]), "uid");
+                        }
+                        if($next_uid == $userlist['uid']) {
+                $isnext = "Du bist dran!";
+                            $charopenscenes++;
+                        }
+                    } else {
+                        $isnext = "Offene Szene - Keine Postingreihenfolge!";
                     }
                     $charscenes++;
                     eval("\$scene_bit .= \"".$templates->get("ipt_misc_bit_scene")."\";");
@@ -1175,7 +1234,7 @@ function ipt_do_newreply()
 }
 
 function ipt_showthread() {
-	global $lang, $templates, $mybb, $forum, $thread, $showthread_inplaytracker;
+	global $lang, $templates, $mybb, $forum, $thread, $showthread_inplaytracker, $db;
 	$lang->load('ipt');	
 	
 	// insert button
@@ -1183,6 +1242,13 @@ function ipt_showthread() {
 	$selectedforums = explode(",", $mybb->settings['ipt_inplay']);
 	foreach($selectedforums as $selected) {
 		if(preg_match("/,{$selected},/i", $forum['parentlist']) || $mybb->settings['ipt_inplay'] == "-1") {
+            $open = $db->fetch_field($db->simple_select("ipt_scenes", "openscene", "tid = '{$thread['tid']}'"), "openscene");
+            $checkpartner = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$mybb->user['uid']}'"), "spid");
+            if($open != 0) {
+                if(!$checkpartner) {
+                    $addopen = "<li class=\"sendthread\"><a href=\"misc.php?action=addtoscene&tid={$thread['tid']}\">{$lang->ipt_addtoscene}</a></li>";
+                }
+            }
 			eval("\$showthread_inplaytracker = \"".$templates->get("ipt_showthread")."\";");
 		}
 	}
