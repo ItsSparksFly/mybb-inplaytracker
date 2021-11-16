@@ -979,9 +979,7 @@ function ipt_global() {
                     // get spid matching lastposteruid
                     $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
                     // now that we've got the spid, we can hopefully see who is next in line
-                    $next = $lastposter_spid + 1;
-                    $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid = '{$next}'"), "uid");
-                    if(empty($next_uid)) {
+                    $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid > '{$lastposter_spid}'", [ "order_by" => "spid", "order_dir" => "ASC", "limit" => "1" ]), "uid");                    if(empty($next_uid)) {
                         $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'", [ "order_by" => 'spid', "order_dir" => 'ASC', 'limit' => 1 ]), "uid");
                     }
                     if($next_uid == $userlist['uid']) {
@@ -1105,8 +1103,7 @@ function ipt_misc() {
                         // get spid matching lastposteruid
                         $lastposter_spid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "spid", "uid = '{$lastposter}' AND tid = '{$thread['tid']}'"), "spid");
                         // now that we've got the spid, we can hopefully see who is next in line
-                        $next = $lastposter_spid + 1;
-                        $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid = '{$next}'"), "uid");
+                        $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}' AND spid > '{$lastposter_spid}'", [ "order_by" => "spid", "order_dir" => "ASC", "limit" => "1" ]), "uid");
                         if(empty($next_uid)) {
                             $next_uid = $db->fetch_field($db->simple_select("ipt_scenes_partners", "uid", "tid = '{$thread['tid']}'", [ "order_by" => 'spid', "order_dir" => 'ASC', 'limit' => 1 ]), "uid");
                         }
