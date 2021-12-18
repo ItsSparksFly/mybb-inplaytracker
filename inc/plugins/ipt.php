@@ -954,7 +954,7 @@ function ipt_global() {
     $query = $db->simple_select("users", "uid", "uid = '{$as_uid}' OR as_uid = '{$as_uid}'");
     while($userlist = $db->fetch_array($query)) {
         // get all scenes for this uid...
-		$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid,".TABLE_PREFIX."ipt_scenes.openscenes FROM ".TABLE_PREFIX."ipt_scenes_partners
+		$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid,".TABLE_PREFIX."ipt_scenes.openscene FROM ".TABLE_PREFIX."ipt_scenes_partners
 		LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
         LEFT JOIN ".TABLE_PREFIX."ipt_scenes ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."ipt_scenes.tid
 		WHERE ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
@@ -1059,7 +1059,7 @@ function ipt_misc() {
         while($userlist = $db->fetch_array($query)) {  
             // get all scenes for this uid...
             $user = get_user($userlist['uid']);
-			$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid,".TABLE_PREFIX."ipt_scenes.openscenes FROM ".TABLE_PREFIX."ipt_scenes_partners
+			$query_2 = $db->query("SELECT ".TABLE_PREFIX."ipt_scenes_partners.tid,".TABLE_PREFIX."ipt_scenes.openscene FROM ".TABLE_PREFIX."ipt_scenes_partners
 			LEFT JOIN ".TABLE_PREFIX."threads ON ".TABLE_PREFIX."ipt_scenes_partners.tid = ".TABLE_PREFIX."threads.tid
             LEFT JOIN ".TABLE_PREFIX."ipt_scenes ON ".TABLE_PREFIX."ipt_scenes.tid = ".TABLE_PREFIX."ipt_scenes_partners.tid
 			WHERE ".TABLE_PREFIX."ipt_scenes_partners.uid = '{$userlist['uid']}'
