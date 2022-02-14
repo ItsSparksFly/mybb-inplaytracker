@@ -1190,8 +1190,8 @@ function ipt_misc() {
 
 function ipt_do_newreply()
 {
-	global $db, $mybb, $lang, $thread, $forum;
-	$lang->load('ipt');
+    global $db, $mybb, $lang, $thread, $forum;
+    $lang->load('ipt');
 
     $forum['parentlist'] = ",".$forum['parentlist'].",";   
     $all_forums = $mybb->settings['ipt_inplay'];
@@ -1213,7 +1213,9 @@ function ipt_do_newreply()
                         MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
                     }
                 }
+            }
 
+            if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
                 while($partners = $db->fetch_array($query)) {
                     $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('ipt_newreply');
                     if ($alertType != NULL && $alertType->getEnabled() && $mybb->user['uid'] != $partners['uid']) {
