@@ -625,10 +625,10 @@ function ipt_newthread()
 
 function ipt_do_newthread()
 {
-    global $db, $mybb, $tid, $partners_new, $partner_uid;
+    global $db, $mybb, $tid, $partners_new, $partner_uid, $visible;
 
     $ownuid = $mybb->user['uid'];
-    if (!empty($mybb->get_input('ipdate'))) {
+    if (!empty($mybb->get_input('ipdate')) && $visible == 1) {
         // insert thread infos into database   
         $ipdate = strtotime($mybb->get_input('ipdate'));
         if (!empty($mybb->get_input('openscene'))) {
