@@ -628,7 +628,7 @@ function ipt_do_newthread()
     global $db, $mybb, $tid, $partners_new, $partner_uid, $visible;
 
     $ownuid = $mybb->user['uid'];
-    if (!empty($mybb->get_input('ipdate')) && $visible == 1) {
+    if (!empty($mybb->get_input('ipdate'))) {
         // insert thread infos into database   
         $ipdate = strtotime($mybb->get_input('ipdate'));
         if (!empty($mybb->get_input('openscene'))) {
@@ -665,7 +665,7 @@ function ipt_do_newthread()
                 $db->insert_query("ipt_scenes_partners", $new_record);
             }
 
-            if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+            if (class_exists('MybbStuff_MyAlerts_AlertTypeManager') && $visible == 1) {
                 $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('ipt_newthread');
                 if ($alertType != NULL && $alertType->getEnabled() && $ownuid != $partner_uid) {
                     $alert = new MybbStuff_MyAlerts_Entity_Alert((int) $partner_uid, $alertType, (int) $tid);
