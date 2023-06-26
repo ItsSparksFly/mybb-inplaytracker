@@ -597,7 +597,7 @@ function ipt_deactivate()
 
 function ipt_newthread()
 {
-    global $mybb, $lang, $templates, $post_errors, $forum, $newthread_inplaytracker;
+    global $mybb, $lang, $db, $templates, $post_errors, $forum, $newthread_inplaytracker, $tid;
     $lang->load('ipt');
 
     $newthread_inplaytracker = "";
@@ -618,6 +618,23 @@ function ipt_newthread()
                     $checked = "checked";
                 }
             }
+            elseif ($tid) {
+                $query = $db->simple_select("ipt_scenes", "*", "tid='{$tid}'");
+                $scene = $db->fetch_array($query);
+                $query = $db->simple_select("ipt_scenes_partners", "uid", "tid='{$tid}'");
+                $partners = [];
+                while ($result = $db->fetch_array($query)) {
+                    $tagged_user = get_user($result['uid']);
+                    $partners[] = $tagged_user['username'];
+                }
+                $partners = implode(",", $partners);
+                $ipdate = date("Y-m-d", $scene['date']);
+                $iport = htmlspecialchars_uni($scene['location']);
+                $ipdescription = htmlspecialchars_uni($scene['shortdesc']);
+                if ($scene['openscene'] == "1") {
+                    $checked = "checked";
+                }
+            }
             eval("\$newthread_inplaytracker = \"" . $templates->get("ipt_newthread") . "\";");
         }
     }
@@ -625,9 +642,11 @@ function ipt_newthread()
 
 function ipt_do_newthread()
 {
-    global $db, $mybb, $tid, $partners_new, $partner_uid, $visible;
+    global $db, $mybb, $tid, $partners_new, $partner_uid, $new_thread, $visible;
 
     $ownuid = $mybb->user['uid'];
+    // check if data already exists, maybe it's coming from a draft?
+    $check = $db->fetch_field($db->simple_select("ipt_scenes", "sid", "tid='{$new_thread['tid']}'"), "sid");
     if (!empty($mybb->get_input('ipdate'))) {
         // insert thread infos into database   
         $ipdate = strtotime($mybb->get_input('ipdate'));
@@ -643,14 +662,18 @@ function ipt_do_newthread()
             "tid" => (int) $tid,
             "openscene" => (int) $openscene
         ];
-        $db->insert_query("ipt_scenes", $new_record);
+        if (!$check) {
+            $db->insert_query("ipt_scenes", $new_record);
+        }
 
         // write scenes + players into database
         $new_record = [
             "tid" => (int) $tid,
             "uid" => (int) $ownuid
         ];
-        $db->insert_query("ipt_scenes_partners", $new_record);
+        if(!$check) {
+            $db->insert_query("ipt_scenes_partners", $new_record);
+        }
 
         $partners_new = explode(",", $mybb->get_input('partners'));
         $partners_new = array_map("trim", $partners_new);
@@ -662,9 +685,10 @@ function ipt_do_newthread()
                 "uid" => (int) $partner_uid
             ];
             if ($partner_uid != 0) {
-                $db->insert_query("ipt_scenes_partners", $new_record);
+                if (!$check) {
+                    $db->insert_query("ipt_scenes_partners", $new_record);
+                }
             }
-
             if (class_exists('MybbStuff_MyAlerts_AlertTypeManager') && $visible == 1) {
                 $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('ipt_newthread');
                 if ($alertType != NULL && $alertType->getEnabled() && $ownuid != $partner_uid) {
